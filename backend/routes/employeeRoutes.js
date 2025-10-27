@@ -1,7 +1,7 @@
 import express from 'express';
-import authMiddleware from '../middlewares/authMiddleware.js';
-import hrMiddleware from '../middlewares/hrMiddleware.js';
-import { getOnboardingStatusController, getAllOnboardingApplicationsController, viewOnboardingApplicationController, reviewOnboardingApplicationController } from '../controllers/employeeController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { hrMiddleware } from '../middlewares/hrMiddleware.js';
+import { getOnboardingStatusController, getAllOnboardingApplicationsController, viewOnboardingApplicationController, reviewOnboardingApplicationController, getMyProfileController, updateMyProfileController, getAllEmployeesController, getEmployeeByIdController, getAllVisaStatusEmployeesController, getEmployeesWithIncompleteOptDocsController, getPendingVisaDocumentController, reviewVisaDocumentController, sendNextStepReminderController } from '../controllers/employeeController.js';
 
 const router = express.Router();
 
@@ -20,12 +20,6 @@ router.get('/onboarding/review/:employeeId', authMiddleware, hrMiddleware, viewO
 router.put('/onboarding/review/:employeeId', authMiddleware, hrMiddleware, reviewOnboardingApplicationController);
 
 // ----------------------------
-// HR - Employee Management
-// ----------------------------
-router.get('/', authMiddleware, hrMiddleware, getAllEmployeesController);
-router.get('/:employeeId', authMiddleware, hrMiddleware, getEmployeeByIdController);
-
-// ----------------------------
 // HR - Visa Status Management
 // ----------------------------
 router.get('/visa-status', authMiddleware, hrMiddleware, getAllVisaStatusEmployeesController);
@@ -33,5 +27,11 @@ router.get('/visa-status/in-progress', authMiddleware, hrMiddleware, getEmployee
 router.get('/visa-status/document/:employeeId', authMiddleware, hrMiddleware, getPendingVisaDocumentController);
 router.put('/visa-status/document/:docId/review', authMiddleware, hrMiddleware, reviewVisaDocumentController);
 router.post('/visa-status/notify/:employeeId', authMiddleware, hrMiddleware, sendNextStepReminderController);
+
+// ----------------------------
+// HR - Employee Management
+// ----------------------------
+router.get('/', authMiddleware, hrMiddleware, getAllEmployeesController);
+router.get('/:employeeId', authMiddleware, hrMiddleware, getEmployeeByIdController);
 
 export default router;

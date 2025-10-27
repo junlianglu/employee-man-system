@@ -1,12 +1,14 @@
+// routes/authRoutes.js
 import express from 'express';
 import { 
-    loginEmployeeController, 
-    logoutEmployeeController, 
+    loginEmployeeController,
+    getCurrentEmployeeController
 } from '../controllers/authController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 router.post('/login', loginEmployeeController);
-router.post('/signup', logoutEmployeeController);
+router.get('/me', authMiddleware, getCurrentEmployeeController);
 
 export default router;

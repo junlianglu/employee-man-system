@@ -5,7 +5,6 @@ import documentRoutes from './routes/documentRoutes.js';
 import registrationTokenRoutes from './routes/registrationTokenRoutes.js';
 import cors from "cors"
 
-import uploadRoutes from "./routes/uploadRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -26,7 +25,6 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/registration-tokens', registrationTokenRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); 
-app.use("/api/upload", uploadRoutes);
 
 export default app;
 

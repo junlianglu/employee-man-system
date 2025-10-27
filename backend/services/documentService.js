@@ -59,6 +59,12 @@ export const documentService = {
           status: 'pending'
         });
         await document.save();
+        
+        const Employee = (await import('../models/Employee.js')).Employee;
+        await Employee.findByIdAndUpdate(
+          employeeId, 
+          { $addToSet: { documents: document._id } }
+        );
       }
 
       return { success: true, data: document };

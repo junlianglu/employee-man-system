@@ -2,6 +2,7 @@ import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import hrMiddleware from '../middlewares/hrMiddleware.js';
 import uploadMiddleware from '../middlewares/uploadMiddleware.js';
+import { getMyDocumentsController, uploadOrReplaceDocumentController, viewDocumentController, downloadDocumentController, getEmployeeDocumentsController, reviewDocumentController, hrViewDocumentController, hrDownloadDocumentController } from '../controllers/documentController.js';
 
 const router = express.Router();
 

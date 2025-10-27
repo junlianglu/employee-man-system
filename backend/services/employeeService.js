@@ -98,7 +98,7 @@ export const getAllEmployees = async ({ page, limit, search, status }) => {
     query.$or = [
       { firstName: { $regex: search, $options: 'i' } },
       { lastName: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } }
+      { preferredName: { $regex: search, $options: 'i' } }
     ];
   }
   

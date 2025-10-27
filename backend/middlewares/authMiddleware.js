@@ -6,7 +6,7 @@ export const authMiddleware = async (req,res,next) => {
         if(!header || !header.startsWith("Bearer "))
             return res.status(401).json({ error: "unauthorized token"});
         const token = header.split(" ")[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); //decode token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.employee = {
             id: decoded.id,
             email: decoded.email,
@@ -15,6 +15,6 @@ export const authMiddleware = async (req,res,next) => {
         };
         next();
     }catch(err){
-        res.status(401).json({ error: "unauthorized token"}); // 401 auth error
+        res.status(401).json({ error: "unauthorized token"});
     }
 };

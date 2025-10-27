@@ -1,6 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import hrMiddleware from '../middlewares/hrMiddleware.js';
+import { getOnboardingStatusController, getAllOnboardingApplicationsController, viewOnboardingApplicationController, reviewOnboardingApplicationController } from '../controllers/employeeController.js';
 
 const router = express.Router();
 

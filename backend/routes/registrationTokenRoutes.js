@@ -1,6 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import hrMiddleware from '../middlewares/hrMiddleware.js';
+import { getAllRegistrationTokensController, generateRegistrationTokenController, validateRegistrationTokenController, completeRegistrationController } from '../controllers/registrationTokenController.js';
 
 const router = express.Router();
 

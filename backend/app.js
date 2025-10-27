@@ -1,5 +1,8 @@
 import express from "express"
 import authRoutes from './routes/authRoutes.js';
+import employeeRoutes from './routes/employeeRoutes.js';
+import documentRoutes from './routes/documentRoutes.js';
+import registrationTokenRoutes from './routes/registrationTokenRoutes.js';
 import cors from "cors"
 
 import uploadRoutes from "./routes/uploadRoutes.js";
@@ -12,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
 }));
 app.use(express.json());

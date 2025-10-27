@@ -7,7 +7,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const documentService = {
-  // Get documents for a specific employee
   async getEmployeeDocuments(employeeId) {
     try {
       const documents = await Document.find({ employeeId })
@@ -19,7 +18,6 @@ export const documentService = {
     }
   },
 
-  // Get current user's documents
   async getMyDocuments(employeeId) {
     try {
       const documents = await Document.find({ employeeId })
@@ -30,17 +28,15 @@ export const documentService = {
     }
   },
 
-  // Upload or replace a document
+
   async uploadOrReplaceDocument(employeeId, documentType, file) {
     try {
-      // Check if document already exists
       let document = await Document.findOne({ 
         employeeId, 
         type: documentType 
       });
 
       if (document) {
-        // Delete old file if exists
         if (document.fileUrl) {
           const oldFilePath = path.join(__dirname, '..', 'uploads', document.fileName);
           if (fs.existsSync(oldFilePath)) {
@@ -48,7 +44,6 @@ export const documentService = {
           }
         }
         
-        // Update existing document
         document.fileName = file.filename;
         document.fileUrl = `/uploads/${file.filename}`;
         document.status = 'pending';
@@ -56,7 +51,6 @@ export const documentService = {
         document.reviewedAt = null;
         await document.save();
       } else {
-        // Create new document
         document = new Document({
           employeeId,
           type: documentType,
@@ -73,7 +67,6 @@ export const documentService = {
     }
   },
 
-  // Review document (approve/reject)
   async reviewDocument(documentId, status, hrFeedback, hrId) {
     try {
       const document = await Document.findById(documentId);
@@ -92,7 +85,6 @@ export const documentService = {
     }
   },
 
-  // Get document by ID
   async getDocumentById(documentId) {
     try {
       const document = await Document.findById(documentId)
@@ -103,12 +95,10 @@ export const documentService = {
     }
   },
 
-  // Get file path for serving
   getFilePath(fileName) {
     return path.join(__dirname, '..', 'uploads', fileName);
   },
 
-  // Check if file exists
   fileExists(fileName) {
     const filePath = this.getFilePath(fileName);
     return fs.existsSync(filePath);

@@ -5,6 +5,7 @@ import App from './App.jsx';
 import { Provider } from 'react-redux';
 import { store } from './app/store.js';
 import { initializeAuth } from './features/auth/authThunks.js';
+import 'antd/dist/reset.css'
 
 store.dispatch(initializeAuth());
 

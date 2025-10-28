@@ -23,7 +23,7 @@ function setToken(token) {
     if (token) localStorage.setItem(TOKEN_KEY, token);
     else localStorage.removeItem(TOKEN_KEY);
   } catch {
-    // ignore storage errors
+
   }
 }
 
@@ -31,7 +31,7 @@ function clearToken() {
   try {
     localStorage.removeItem(TOKEN_KEY);
   } catch {
-    // ignore storage errors
+
   }
 }
 
@@ -58,7 +58,7 @@ async function apiFetch(path, options = {}) {
 
   let bodyToSend = body;
   if (body instanceof FormData) {
-    // Let the browser set the Content-Type boundary
+
   } else if (body !== undefined && body !== null) {
     finalHeaders.set('Content-Type', 'application/json');
     bodyToSend = JSON.stringify(body);

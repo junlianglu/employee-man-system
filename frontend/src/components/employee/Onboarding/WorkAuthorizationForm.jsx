@@ -35,17 +35,31 @@ export default function WorkAuthorizationForm({
                     rules={[{ required: true, message: 'Required for work visa' }]}
                   >
                     <Select placeholder="Select type">
-                      <Select.Option value="h1b">H-1B</Select.Option>
-                      <Select.Option value="l1">L-1</Select.Option>
-                      <Select.Option value="opt">OPT</Select.Option>
-                      <Select.Option value="stem_opt">STEM OPT</Select.Option>
-                      <Select.Option value="other">Other</Select.Option>
+                      <Select.Option value="H1-B">H1-B</Select.Option>
+                      <Select.Option value="L2">L2</Select.Option>
+                      <Select.Option value="F1(CPT/OPT)">F1(CPT/OPT)</Select.Option>
+                      <Select.Option value="H4">H4</Select.Option>
+                      <Select.Option value="Other">Other</Select.Option>
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Form.Item name={visaTitleName} label="Visa Title" rules={[{ max: 60 }] }>
-                    <Input placeholder="e.g., Software Engineer" />
+                  <Form.Item noStyle shouldUpdate={(p, c) => p[workTypeName] !== c[workTypeName]}>
+                    {({ getFieldValue }) => {
+                      const isOther = getFieldValue(workTypeName) === 'Other';
+                      return (
+                        <Form.Item
+                          name={visaTitleName}
+                          label="Visa Title"
+                          rules={[
+                            { max: 60 },
+                            ...(isOther ? [{ required: true, message: 'Title is required for Other' }] : []),
+                          ]}
+                        >
+                          <Input placeholder="e.g., Software Engineer" />
+                        </Form.Item>
+                      );
+                    }}
                   </Form.Item>
                 </Col>
               </Row>

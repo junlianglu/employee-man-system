@@ -3,8 +3,19 @@ import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 export default function EmergencyContactForm({ name = 'emergencyContacts', min = 1, max = 3 }) {
   return (
-    <Form.List name={name}>
-      {(fields, { add, remove }) => (
+    <Form.List 
+      name={name}
+      rules={[
+        {
+          validator: async (_, contacts) => {
+            if (!contacts || contacts.length < min) {
+              return Promise.reject(new Error(`At least ${min} emergency contact(s) required`));
+            }
+          },
+        },
+      ]}
+    >
+      {(fields, { add, remove }, { errors }) => (
         <>
           {fields.map(({ key, name: itemName, ...restField }, index) => (
             <Space
@@ -82,30 +93,16 @@ export default function EmergencyContactForm({ name = 'emergencyContacts', min =
               </div>
             </Space>
           ))}
-          <Form.Item
-            shouldUpdate
-            rules={[
-              {
-                validator: async (_, value) => {
-                  if (!value || value.length < min) {
-                    return Promise.reject(new Error(`At least ${min} contact(s) required`));
-                  }
-                },
-              },
-            ]}
+          <Button
+            type="dashed"
+            onClick={() => add()}
+            block
+            icon={<PlusOutlined />}
+            disabled={fields.length >= max}
           >
-            {() => (
-              <Button
-                type="dashed"
-                onClick={() => add()}
-                block
-                icon={<PlusOutlined />}
-                disabled={fields.length >= max}
-              >
-                Add emergency contact
-              </Button>
-            )}
-          </Form.Item>
+            Add emergency contact
+          </Button>
+          <Form.ErrorList errors={errors} />
         </>
       )}
     </Form.List>

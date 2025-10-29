@@ -6,12 +6,12 @@ import { fetchOnboardingStatus } from '../../features/employee/employeeThunks.js
 import { selectOnboardingStatusData, selectOnboardingStatusState } from '../../features/employee/employeeSelectors.js';
 import {
   fetchMyDocuments,
-  uploadDocumentThunk,
+  uploadMyDocument,
 } from '../../features/document/documentThunks.js';
 import {
   selectMyDocuments,
   selectMyDocumentsStatus,
-  selectUploadStatus,
+  selectMyUploadStatus,
 } from '../../features/document/documentSelectors.js';
 import NextStepIndicator from '../../components/employee/VisaStatus/NextStepIndicator.jsx';
 import DocumentStep from '../../components/employee/VisaStatus/DocumentStep.jsx';
@@ -25,7 +25,7 @@ export default function OnboardingPage() {
 
   const myDocs = useSelector(selectMyDocuments);
   const myDocsStatus = useSelector(selectMyDocumentsStatus);
-  const uploadStatus = useSelector(selectUploadStatus);
+  const uploadStatus = useSelector(selectMyUploadStatus);
 
   const [modal, setModal] = useState({ open: false, doc: null });
 
@@ -105,7 +105,7 @@ export default function OnboardingPage() {
         uploading={uploadStatus === 'loading'}
         onSubmit={async ({ type, file }) => {
           try {
-            await dispatch(uploadDocumentThunk({ type, file })).unwrap();
+            await dispatch(uploadMyDocument({ type, file })).unwrap();
             message.success('Document uploaded');
             setModal({ open: false, doc: null });
           } catch (e) {

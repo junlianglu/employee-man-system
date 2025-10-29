@@ -73,7 +73,6 @@ export default function EmploymentSection() {
       message.error(res.error.message || 'Failed to save');
     } else {
       message.success('Saved');
-      dispatch(fetchMyProfile());
     }
   };
 

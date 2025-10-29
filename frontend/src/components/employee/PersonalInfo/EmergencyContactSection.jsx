@@ -34,7 +34,6 @@ export default function EmergencyContactSection() {
       message.error(res.error.message || 'Failed to save');
     } else {
       message.success('Saved');
-      dispatch(fetchMyProfile());
     }
   };
 

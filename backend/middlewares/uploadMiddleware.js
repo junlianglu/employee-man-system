@@ -63,7 +63,4 @@ const handleUploadError = (error, req, res, next) => {
   next(error);
 };
 
-export default {
-  single: upload.single('file'),
-  errorHandler: handleUploadError
-};
+export default upload;

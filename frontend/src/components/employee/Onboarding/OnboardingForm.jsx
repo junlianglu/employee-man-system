@@ -30,6 +30,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
       delete payload.visaStartDate;
       delete payload.visaEndDate;
     }
+    if (payload.confirmPassword) delete payload.confirmPassword;
     onSubmit?.(payload);
   };
 
@@ -122,8 +123,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
             <Radio.Group>
               <Radio value="male">Male</Radio>
               <Radio value="female">Female</Radio>
-              <Radio value="other">Other</Radio>
-              <Radio value="prefer_not_to_say">Prefer not to say</Radio>
+              <Radio value="I do not wish to answer">I do not wish to answer</Radio>
             </Radio.Group>
           </Form.Item>
         </Col>

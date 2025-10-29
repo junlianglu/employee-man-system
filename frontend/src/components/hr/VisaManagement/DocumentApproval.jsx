@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Card, Table, Button, Space, Tag, Tooltip } from 'antd';
 import { EyeOutlined, DownloadOutlined, CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import FeedbackModal from '../../components/common/Modals/FeedbackModal.jsx';
+import FeedbackModal from '../../common/Modals/FeedbackModal.jsx';
 
 function statusTag(status) {
   if (status === 'approved') return <Tag color="green">Approved</Tag>;

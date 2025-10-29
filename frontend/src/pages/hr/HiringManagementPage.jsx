@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Row, Col, message } from 'antd';
-import TokenGenerator from '../../hr/HiringManagement/TokenGenerator.jsx';
-import TokenHistory from '../../hr/HiringManagement/TokenHistory.jsx';
-import ApplicationReview from '../../hr/HiringManagement/ApplicationReview.jsx';
+import TokenGenerator from '../../components/hr/HiringManagement/TokenGenerator.jsx';
+import TokenHistory from '../../components/hr/HiringManagement/TokenHistory.jsx';
+import ApplicationReview from '../../components/hr/HiringManagement/ApplicationReview.jsx';
 
 import {
   fetchRegistrationTokens,

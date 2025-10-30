@@ -8,6 +8,7 @@ import AddressSection from './AddressSection.jsx';
 import ContactSection from './ContactSection.jsx';
 import EmploymentSection from './EmploymentSection.jsx';
 import EmergencyContactSection from './EmergencyContactSection.jsx';
+import DocumentsReadOnlySection from './DocumentsReadOnlySection.jsx';
 
 export default function PersonalInfoSection() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default function PersonalInfoSection() {
     { key: 'contact', label: 'Contact', children: <ContactSection /> },
     { key: 'employment', label: 'Work Authorization', children: <EmploymentSection /> },
     { key: 'emergency', label: 'Emergency Contacts', children: <EmergencyContactSection /> },
+    { key: 'documents', label: 'Documents', children: <DocumentsReadOnlySection /> },
   ];
 
   return (

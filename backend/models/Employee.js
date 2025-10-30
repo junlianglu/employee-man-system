@@ -11,18 +11,18 @@ const employeeSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   preferredName: { type: String },
   address: {
-    street: { type: String, required: true },
+    street: { type: String },
     unit: { type: String },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zip: { type: String, required: true },
+    city: { type: String },
+    state: { type: String },
+    zip: { type: String },
   },
-  cellPhone: { type: String, required: true },
+  cellPhone: { type: String },
   workPhone: { type: String },
-  ssn: { type: String, required: true },
+  ssn: { type: String },
   dateOfBirth: {
     type: Date,
-    required: true,
+    required: false,
     validate: {
       validator: (value) => value < new Date(),
       message: 'Date of birth must be in the past'
@@ -31,14 +31,14 @@ const employeeSchema = new mongoose.Schema({
   gender: {
     type: String,
     enum: ['male', 'female', 'I do not wish to answer'],
-    required: true
+    required: false
   },
 
   // Citizenship and work authorization
   citizenshipStatus: {
     type: String,
     enum: ['citizen', 'permanent_resident', 'work_visa'],
-    required: true
+    required: false
   },
   workAuthorizationType: {
     type: String,
@@ -68,22 +68,22 @@ const employeeSchema = new mongoose.Schema({
 
   // Reference (1 only)
   reference: {
-    firstName: { type: String, required: true },
+    firstName: { type: String, required: false },
     middleName: { type: String },
-    lastName: { type: String, required: true },
+    lastName: { type: String, required: false },
     phone: { type: String },
     email: { type: String },
-    relationship: { type: String, required: true }
+    relationship: { type: String, required: false }
   },
 
   // Emergency contacts (1+)
   emergencyContacts: [{
-    firstName: { type: String, required: true },
+    firstName: { type: String, required: false },
     middleName: { type: String },
-    lastName: { type: String, required: true },
+    lastName: { type: String, required: false },
     phone: { type: String },
     email: { type: String },
-    relationship: { type: String, required: true }
+    relationship: { type: String, required: false }
   }],
 
   documents: [

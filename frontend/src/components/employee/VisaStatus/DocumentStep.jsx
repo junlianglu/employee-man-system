@@ -24,6 +24,7 @@ export default function DocumentStep({
   onUpload,
   onView,
   onDownload,
+  required = false,
 }) {
   const hasFile = !!doc?.fileUrl;
   const label = toLabel(doc?.type);
@@ -32,7 +33,12 @@ export default function DocumentStep({
       <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
         <Space direction="vertical" size={4}>
           <Space>
-            <Typography.Text strong>{label}</Typography.Text>
+            <Typography.Text strong>
+              {required && (
+                <Typography.Text style={{ color: '#ff4d4f', marginRight: 4 }}>*</Typography.Text>
+              )}
+              {label}
+            </Typography.Text>
             <Tag color={statusColor(doc?.status || (hasFile ? 'pending' : 'default'))}>
               {doc?.status ? doc.status.toUpperCase() : hasFile ? 'PENDING' : 'MISSING'}
             </Tag>

@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Card, Row, Col, Typography } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthForm from '../../components/common/Auth/AuthForm.jsx';
 import { selectIsAuthenticated, selectIsHR } from '../../features/auth/authSelectors.js';
+import { fetchOnboardingStatus } from '../../features/employee/employeeThunks.js';
 
 export default function LoginPage() {
+  const dispatch = useDispatch();
   const isAuthed = useSelector(selectIsAuthenticated);
   const isHR = useSelector(selectIsHR);
   const navigate = useNavigate();
@@ -13,10 +15,26 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthed) {
-      const to = location.state?.from?.pathname || (isHR ? '/hr' : '/employee');
-      navigate(to, { replace: true });
+      if (isHR) {
+        navigate('/hr', { replace: true });
+      } else {
+        (async () => {
+          try {
+            const { status } = await dispatch(fetchOnboardingStatus()).unwrap();
+            if (status === 'never_submitted') {
+              navigate('/employee/onboarding', { replace: true });
+            } else {
+              const to = location.state?.from?.pathname || '/employee';
+              navigate(to, { replace: true });
+            }
+          } catch {
+            const to = location.state?.from?.pathname || '/employee';
+            navigate(to, { replace: true });
+          }
+        })();
+      }
     }
-  }, [isAuthed, isHR, navigate, location.state]);
+  }, [isAuthed, isHR, navigate, location.state, dispatch]);
 
   return (
     <Row justify="center" align="middle" style={{ minHeight: '80vh', padding: 16 }}>

@@ -4,12 +4,12 @@ import { Form, Input, Button, Alert, Card, Typography } from 'antd';
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../../features/auth/authThunks.js';
-import { selectLoginStatus, selectAuthError, selectCurrentUser } from '../../../features/auth/authSelectors.js';
+import { fetchOnboardingStatus } from '../../../features/employee/employeeThunks.js';
+import { selectLoginStatus, selectAuthError } from '../../../features/auth/authSelectors.js';
 
 export default function AuthForm({ title = 'Sign In', onSuccess, redirectTo }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector(selectCurrentUser);
   const status = useSelector(selectLoginStatus);
   const error = useSelector(selectAuthError);
   const [formError, setFormError] = useState(null);
@@ -22,7 +22,18 @@ export default function AuthForm({ title = 'Sign In', onSuccess, redirectTo }) {
       if (onSuccess) onSuccess(res);
       else {
         if (redirectTo) navigate(redirectTo, { replace: true });
-        else navigate(isHR ? '/hr' : '/employee', { replace: true });
+        else {
+          if (isHR) navigate('/hr', { replace: true });
+          else {
+            try {
+              const { status } = await dispatch(fetchOnboardingStatus()).unwrap();
+              const dest = status === 'never_submitted' ? '/employee/onboarding' : '/employee';
+              navigate(dest, { replace: true });
+            } catch {
+              navigate('/employee', { replace: true });
+            }
+          }
+        }
       }
     } catch (e) {
       setFormError(e?.message || 'Login failed');

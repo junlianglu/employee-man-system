@@ -78,6 +78,48 @@ export const getEmployeeById = async (employeeId) => {
 };
 
 export const updateEmployee = async (employeeId, updateData) => {
+  // Enforce onboarding required fields when moving to pending
+  if (updateData?.onboardingReview?.status === 'pending') {
+    const required = [];
+    const has = (obj, path) => path.split('.').reduce((o, k) => (o && o[k] !== undefined && o[k] !== null ? o[k] : undefined), obj) !== undefined;
+    const check = (cond, name) => { if (!cond) required.push(name); };
+
+    check(!!updateData.username, 'username');
+    check(!!updateData.ssn, 'ssn');
+    check(!!updateData.dateOfBirth, 'dateOfBirth');
+    check(!!updateData.gender, 'gender');
+    check(!!has(updateData, 'address.street'), 'address.street');
+    check(!!has(updateData, 'address.city'), 'address.city');
+    check(!!has(updateData, 'address.state'), 'address.state');
+    check(!!has(updateData, 'address.zip'), 'address.zip');
+    check(!!updateData.cellPhone, 'cellPhone');
+
+    // Reference (1 only)
+    check(!!has(updateData, 'reference.firstName'), 'reference.firstName');
+    check(!!has(updateData, 'reference.lastName'), 'reference.lastName');
+    check(!!has(updateData, 'reference.relationship'), 'reference.relationship');
+
+    // Emergency contacts (at least 1)
+    check(Array.isArray(updateData.emergencyContacts) && updateData.emergencyContacts.length > 0, 'emergencyContacts[0]');
+
+    // Citizenship/work visa dependencies
+    check(!!updateData.citizenshipStatus, 'citizenshipStatus');
+    if (updateData.citizenshipStatus === 'work_visa') {
+      check(!!updateData.workAuthorizationType, 'workAuthorizationType');
+      check(!!updateData.visaStartDate, 'visaStartDate');
+      check(!!updateData.visaEndDate, 'visaEndDate');
+      if (updateData.workAuthorizationType === 'Other') {
+        check(!!updateData.visaTitle, 'visaTitle');
+      }
+    }
+
+    if (required.length > 0) {
+      const err = new Error(`Missing required fields: ${required.join(', ')}`);
+      err.code = 'ONBOARDING_VALIDATION';
+      throw err;
+    }
+  }
+
   const employee = await Employee.findByIdAndUpdate(
     employeeId,
     updateData,

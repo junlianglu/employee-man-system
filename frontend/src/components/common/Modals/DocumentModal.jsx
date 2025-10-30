@@ -21,13 +21,14 @@ export default function DocumentModal({
   onCancel,
 }) {
   const [form] = Form.useForm();
+  const isLockedType = Array.isArray(allowedTypes) && allowedTypes.length === 1;
 
   useEffect(() => {
     if (open) {
       form.resetFields();
-      form.setFieldsValue({ type: defaultType || document?.type });
+      form.setFieldsValue({ type: (isLockedType ? allowedTypes[0] : (defaultType || document?.type)) });
     }
-  }, [open, defaultType, document, form]);
+  }, [open, defaultType, document, form, isLockedType, allowedTypes]);
 
   const handleOk = () => form.submit();
 
@@ -74,13 +75,21 @@ export default function DocumentModal({
           label="Document Type"
           rules={[{ required: true, message: 'Please select a document type' }]}
         >
-          <Select placeholder="Select type">
-            {allowedTypes.map((t) => (
-              <Select.Option key={t} value={t}>
-                {t.replace(/_/g, ' ')}
+          {isLockedType ? (
+            <Select disabled value={allowedTypes[0]}>
+              <Select.Option value={allowedTypes[0]}>
+                {allowedTypes[0].replace(/_/g, ' ')}
               </Select.Option>
-            ))}
-          </Select>
+            </Select>
+          ) : (
+            <Select placeholder="Select type">
+              {allowedTypes.map((t) => (
+                <Select.Option key={t} value={t}>
+                  {t.replace(/_/g, ' ')}
+                </Select.Option>
+              ))}
+            </Select>
+          )}
         </Form.Item>
 
         <Form.Item

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Form, Input, Row, Col, DatePicker, Radio, Divider, Button, Typography } from 'antd';
 import dayjs from 'dayjs';
 import AddressForm from '../../common/Forms/AddressForm.jsx';
@@ -7,7 +7,7 @@ import EmergencyContactForm from '../../common/Forms/EmergencyContactForm.jsx';
 import ReferenceForm from './ReferenceForm.jsx';
 import WorkAuthorizationForm from './WorkAuthorizationForm.jsx';
 
-export default function OnboardingForm({ initialValues, submitting = false, onSubmit, readOnly = false, showAccount = true, showEmail = true, onValuesChange }) {
+export default function OnboardingForm({ initialValues, submitting = false, onSubmit, readOnly = false, showAccount = true, showEmail = true, onValuesChange, showActions = true, onMount }) {
   const [form] = Form.useForm();
 
   const normalizedInitialValues = useMemo(() => {
@@ -18,6 +18,13 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
     if (clone.dateOfBirth) clone.dateOfBirth = dayjs(clone.dateOfBirth);
     return clone;
   }, [initialValues]);
+
+  // expose form submit to parent if requested
+  useEffect(() => {
+    if (onMount) {
+      onMount({ submit: () => form.submit(), reset: () => form.resetFields() });
+    }
+  }, [onMount, form]);
 
   const handleFinish = (values) => {
     const payload = { ...values };
@@ -48,6 +55,9 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
       disabled={readOnly}
       onValuesChange={(_, allValues) => onValuesChange?.(allValues)}
     >
+      {onMount ? (
+        <></>
+      ) : null}
       {showAccount && (
         <>
           <Typography.Title level={4} style={{ marginTop: 0 }}>Account</Typography.Title>
@@ -59,15 +69,6 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
                 rules={[{ required: true, message: 'Username is required' }, { min: 3 }, { max: 32 }]}
               >
                 <Input placeholder="Choose a username" autoComplete="username" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={12}>
-              <Form.Item
-                name="preferredName"
-                label="Preferred Name"
-                rules={[{ max: 60 }]}
-              >
-                <Input placeholder="Optional" />
               </Form.Item>
             </Col>
           </Row>
@@ -108,7 +109,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
 
       <Typography.Title level={4}>Personal Information</Typography.Title>
       <Row gutter={16}>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <Form.Item
             name="firstName"
             label="First Name"
@@ -117,7 +118,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
             <Input placeholder="First name" />
           </Form.Item>
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <Form.Item
             name="middleName"
             label="Middle Name"
@@ -126,7 +127,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
             <Input placeholder="Optional" />
           </Form.Item>
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <Form.Item
             name="lastName"
             label="Last Name"
@@ -135,16 +136,17 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
             <Input placeholder="Last name" />
           </Form.Item>
         </Col>
+        <Col xs={24} md={6}>
+          <Form.Item
+            name="preferredName"
+            label="Preferred Name"
+            rules={[{ max: 60 }]}
+          >
+            <Input placeholder="Optional" />
+          </Form.Item>
+        </Col>
       </Row>
-      {showEmail && (
-        <Row gutter={16}>
-          <Col xs={24} md={12}>
-            <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }, { type: 'email', message: 'Invalid email' }]}>
-              <Input disabled placeholder="Email" />
-            </Form.Item>
-          </Col>
-        </Row>
-      )}
+      
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
@@ -155,17 +157,6 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
             <Input placeholder="123-45-6789" maxLength={11} />
           </Form.Item>
         </Col>
-        {!showAccount && (
-          <Col xs={24} md={12}>
-            <Form.Item
-              name="preferredName"
-              label="Preferred Name"
-              rules={[{ max: 60 }]}
-            >
-              <Input placeholder="Optional" />
-            </Form.Item>
-          </Col>
-        )}
         <Col xs={24} md={12}>
           <Form.Item
             name="dateOfBirth"
@@ -195,6 +186,16 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
       <Typography.Title level={4}>Contact</Typography.Title>
       <ContactForm includeWorkPhone={true} />
 
+      {showEmail && (
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Email is required' }, { type: 'email', message: 'Invalid email' }]}>
+              <Input disabled placeholder="Email" />
+            </Form.Item>
+          </Col>
+        </Row>
+      )}
+
       <Divider />
 
       <Typography.Title level={4}>Work Authorization</Typography.Title>
@@ -212,7 +213,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
 
       <Divider />
 
-      {!readOnly && (
+      {!readOnly && showActions && (
         <Row justify="end" gutter={8}>
           <Col>
             <Button onClick={() => form.resetFields()} disabled={submitting}>Reset</Button>

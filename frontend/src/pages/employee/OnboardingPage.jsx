@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Row, Col, Card, message, Typography, Alert } from 'antd';
+import { Row, Col, Card, message, Typography, Alert, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ALLOWED_TYPES, viewDocument, downloadDocument } from '../../api/documents.js';
 import { fetchOnboardingStatus, fetchMyProfile, updateMyProfileThunk } from '../../features/employee/employeeThunks.js';
@@ -31,12 +31,13 @@ export default function OnboardingPage() {
   const uploadStatus = useSelector(selectMyUploadStatus);
 
   const [modal, setModal] = useState({ open: false, doc: null });
+  const [formApi, setFormApi] = useState({ submit: () => {}, reset: () => {} });
 
   useEffect(() => {
     dispatch(fetchOnboardingStatus());
     dispatch(fetchMyDocuments());
     if (!profile) dispatch(fetchMyProfile());
-  }, [dispatch]);
+  }, [dispatch, profile]);
 
   useEffect(() => {
     if (onboarding?.status === 'approved') {
@@ -80,7 +81,7 @@ export default function OnboardingPage() {
   const handleView = useCallback(async (doc) => {
     if (!doc?._id) return;
     try {
-      const { blob, contentType } = await viewDocument(doc._id);
+      const { blob } = await viewDocument(doc._id);
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank', 'noopener,noreferrer');
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
@@ -149,6 +150,8 @@ export default function OnboardingPage() {
                 submitting={false}
                 showAccount={false}
                 showEmail={true}
+                showActions={false}
+                onMount={setFormApi}
                 onValuesChange={setFormSnapshot}
                 onSubmit={async (values) => {
                   try {
@@ -192,10 +195,30 @@ export default function OnboardingPage() {
         </Col>
       </Row>
 
+      <Row gutter={[16, 16]} style={{ padding: 16, paddingTop: 0 }}>
+        <Col xs={24}>
+          <Card bordered={false} bodyStyle={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Row gutter={8}>
+              <Col>
+                <Button onClick={() => formApi.reset?.()}>
+                  Reset
+                </Button>
+              </Col>
+              <Col>
+                <Button type="primary" onClick={() => formApi.submit?.()}>
+                  Submit
+                </Button>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+
       <DocumentModal
         open={modal.open}
         title="Upload Document"
         defaultType={modal.doc?.type}
+        allowedTypes={modal.doc?.type ? [modal.doc.type] : undefined}
         document={modal.doc?._id ? modal.doc : null}
         uploading={uploadStatus === 'loading'}
         onSubmit={async ({ type, file }) => {

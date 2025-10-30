@@ -1,8 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Row, Col, Spin, Result, Card, Typography, message } from 'antd';
-import OnboardingForm from '../../components/employee/Onboarding/OnboardingForm.jsx';
+import { Row, Col, Spin, Result, Card, Typography, message, Form, Input, Button } from 'antd';
 import {
   validateRegistrationTokenThunk,
   submitRegistrationThunk,
@@ -31,14 +30,7 @@ export default function RegisterPage() {
     if (token) dispatch(validateRegistrationTokenThunk({ token }));
   }, [dispatch, token]);
 
-  const initialValues = useMemo(() => {
-    // Email/name come from token; form doesn't include email (backend binds it)
-    return {
-      citizenshipStatus: 'citizen',
-      emergencyContacts: [{}],
-      reference: {},
-    };
-  }, []);
+  const [form] = Form.useForm();
 
   if (validationStatus === 'loading') {
     return (
@@ -72,19 +64,58 @@ export default function RegisterPage() {
             </Typography.Paragraph>
           ) : null}
 
-          <OnboardingForm
-            initialValues={initialValues}
-            submitting={submitStatus === 'loading'}
-            onSubmit={async (values) => {
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={async (values) => {
               try {
                 await dispatch(submitRegistrationThunk({ token, employeeData: values })).unwrap();
                 message.success('Registration complete. You can now sign in.');
                 navigate('/auth/login', { replace: true });
               } catch (e) {
-
+                // error handled below
               }
             }}
-          />
+            initialValues={{ username: '' }}
+          >
+            <Form.Item
+              name="username"
+              label="Username"
+              rules={[{ required: true, message: 'Username is required' }, { min: 3 }, { max: 32 }]}
+            >
+              <Input placeholder="Choose a username" autoComplete="username" />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: 'Password is required' }, { min: 6 }]}
+              hasFeedback
+            >
+              <Input.Password autoComplete="new-password" placeholder="Enter a strong password" />
+            </Form.Item>
+            <Form.Item
+              name="confirmPassword"
+              label="Confirm Password"
+              dependencies={["password"]}
+              hasFeedback
+              rules={[
+                { required: true, message: 'Please confirm your password' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) return Promise.resolve();
+                    return Promise.reject(new Error('Passwords do not match'));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password autoComplete="new-password" placeholder="Re-enter password" />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={submitStatus === 'loading'} block>
+                Create Account
+              </Button>
+            </Form.Item>
+          </Form>
 
           {submitStatus === 'failed' && submitError ? (
             <Typography.Paragraph type="danger" style={{ marginTop: 16 }}>

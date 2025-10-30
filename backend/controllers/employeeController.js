@@ -122,6 +122,9 @@ export const updateMyProfileController = async (req, res) => {
     });
   } catch (error) {
     console.error('Update profile error:', error);
+    if (error.code === 'ONBOARDING_VALIDATION') {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: 'Failed to update profile' });
   }
 };

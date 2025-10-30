@@ -97,48 +97,8 @@ export const completeRegistrationController = async (req, res) => {
     const { token } = req.params;
     const employeeData = req.body;
     
-    const requiredFields = ['username', 'password', 'address', 'cellPhone', 'ssn', 
-                           'dateOfBirth', 'gender', 'citizenshipStatus', 'reference', 
-                           'emergencyContacts'];
-    
-    const missingFields = requiredFields.filter(field => {
-      if (field === 'address') {
-        return !employeeData.address || 
-               !employeeData.address.street || 
-               !employeeData.address.city || 
-               !employeeData.address.state || 
-               !employeeData.address.zip;
-      }
-      if (field === 'reference') {
-        return !employeeData.reference || 
-               !employeeData.reference.firstName || 
-               !employeeData.reference.lastName || 
-               !employeeData.reference.relationship;
-      }
-      if (field === 'emergencyContacts') {
-        return !employeeData.emergencyContacts || 
-               employeeData.emergencyContacts.length === 0;
-      }
-      return !employeeData[field];
-    });
-    
-    if (missingFields.length > 0) {
-      return res.status(400).json({ 
-        error: `Missing required fields: ${missingFields.join(', ')}` 
-      });
-    }
-    
-    if (employeeData.citizenshipStatus === 'work_visa') {
-      if (!employeeData.workAuthorizationType) {
-        return res.status(400).json({ 
-          error: 'workAuthorizationType is required for work visa' 
-        });
-      }
-      if (!employeeData.visaStartDate || !employeeData.visaEndDate) {
-        return res.status(400).json({ 
-          error: 'visaStartDate and visaEndDate are required for work visa' 
-        });
-      }
+    if (!employeeData?.username || !employeeData?.password) {
+      return res.status(400).json({ error: 'Username and password are required' });
     }
     
     const employee = await registrationTokenService.completeRegistration(token, employeeData);

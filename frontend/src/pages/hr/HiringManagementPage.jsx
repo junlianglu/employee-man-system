@@ -17,14 +17,10 @@ import {
 
 import {
   fetchOnboardingApplications,
-  fetchOnboardingApplicationDetail,
-  reviewOnboardingApplicationThunk,
 } from '../../features/employee/employeeThunks.js';
 import {
   selectOnboardingApplications,
   selectOnboardingApplicationsStatus,
-  selectApplicationDetail,
-  selectApplicationDetailStatus,
 } from '../../features/employee/employeeSelectors.js';
 
 export default function HiringManagementPage() {
@@ -56,37 +52,12 @@ export default function HiringManagementPage() {
 
   const apps = useSelector(selectOnboardingApplications);
   const appsStatus = useSelector(selectOnboardingApplicationsStatus);
-  const detail = useSelector(selectApplicationDetail);
-  const detailStatus = useSelector(selectApplicationDetailStatus);
 
   useEffect(() => {
     dispatch(fetchOnboardingApplications(filter));
   }, [dispatch, filter]);
 
   const handleRefreshList = () => dispatch(fetchOnboardingApplications(filter));
-  const handleSelectApplication = (id) => dispatch(fetchOnboardingApplicationDetail(id));
-
-  const handleApprove = async ({ employeeId, hrFeedback }) => {
-    try {
-      await dispatch(reviewOnboardingApplicationThunk({ employeeId, status: 'approved', hrFeedback })).unwrap();
-      message.success('Application approved');
-      handleRefreshList();
-      dispatch(fetchOnboardingApplicationDetail(employeeId));
-    } catch (e) {
-      message.error(e?.message || 'Failed to approve');
-    }
-  };
-
-  const handleReject = async ({ employeeId, hrFeedback }) => {
-    try {
-      await dispatch(reviewOnboardingApplicationThunk({ employeeId, status: 'rejected', hrFeedback })).unwrap();
-      message.success('Application rejected');
-      handleRefreshList();
-      dispatch(fetchOnboardingApplicationDetail(employeeId));
-    } catch (e) {
-      message.error(e?.message || 'Failed to reject');
-    }
-  };
 
   return (
     <Row gutter={[16, 16]} style={{ padding: 16 }}>
@@ -112,11 +83,6 @@ export default function HiringManagementPage() {
           filter={filter}
           onChangeFilter={setFilter}
           onRefreshList={handleRefreshList}
-          onSelectApplication={handleSelectApplication}
-          detail={detail}
-          detailLoading={detailStatus === 'loading'}
-          onApprove={handleApprove}
-          onReject={handleReject}
         />
       </Col>
     </Row>

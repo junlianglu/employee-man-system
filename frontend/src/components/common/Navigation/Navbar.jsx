@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   DashboardOutlined,
-  FileTextOutlined,
   IdcardOutlined,
   TeamOutlined,
   AuditOutlined,
@@ -13,6 +12,7 @@ import {
 import NavItem from './NavItem.jsx';
 import UserMenu from './UserMenu.jsx';
 import { selectIsAuthenticated, selectIsHR } from '../../../features/auth/authSelectors.js';
+import { selectOnboardingStatusData } from '../../../features/employee/employeeSelectors.js';
 
 const { Header } = Layout;
 
@@ -32,7 +32,11 @@ function useActiveKey() {
 export default function Navbar() {
   const isAuthed = useSelector(selectIsAuthenticated);
   const isHR = useSelector(selectIsHR);
+  const onboardingData = useSelector(selectOnboardingStatusData);
   const activeKey = useActiveKey();
+
+  // Check if employee's onboarding is approved
+  const isOnboardingApproved = isHR || onboardingData?.status === 'approved';
 
   const leftItems = isHR
     ? [
@@ -41,12 +45,13 @@ export default function Navbar() {
         { to: '/hr/employees', label: 'Employees', icon: <TeamOutlined /> },
         { to: '/hr/visa', label: 'Visa Mgmt', icon: <AuditOutlined /> },
       ]
-    : [
+    : isOnboardingApproved
+    ? [
         { to: '/employee', label: 'Dashboard', icon: <DashboardOutlined /> },
         { to: '/employee/personal-info', label: 'Personal Info', icon: <IdcardOutlined /> },
         { to: '/employee/visa-status', label: 'Visa Status', icon: <ApartmentOutlined /> },
-        { to: '/employee/documents', label: 'Documents', icon: <FileTextOutlined /> },
-      ];
+      ]
+    : []; // Hide all navigation links if onboarding is not approved
 
   return (
     <Header style={{ display: 'flex', alignItems: 'center', paddingInline: 16 }}>

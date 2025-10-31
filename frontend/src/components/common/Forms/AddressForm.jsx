@@ -11,7 +11,18 @@ export default function AddressForm({ name = 'address', required = true, label =
             label={`${label} Street`}
             rules={[...req, { max: 120, message: 'Max 120 characters' }]}
           >
-            <Input placeholder="123 Main St Apt 4B" />
+            <Input placeholder="123 Main St" />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={[name, 'unit']}
+            label="Building/Apt #"
+            rules={[{ max: 40, message: 'Max 40 characters' }]}
+          >
+            <Input placeholder="Optional" />
           </Form.Item>
         </Col>
       </Row>

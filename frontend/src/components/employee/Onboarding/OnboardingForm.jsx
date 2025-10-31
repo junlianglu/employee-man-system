@@ -11,11 +11,19 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
   const [form] = Form.useForm();
 
   const normalizedInitialValues = useMemo(() => {
-    if (!initialValues) return undefined;
+    if (!initialValues) {
+      return {
+        emergencyContacts: [{}]
+      };
+    }
     const clone = { ...initialValues };
     if (clone.visaStartDate) clone.visaStartDate = dayjs(clone.visaStartDate);
     if (clone.visaEndDate) clone.visaEndDate = dayjs(clone.visaEndDate);
     if (clone.dateOfBirth) clone.dateOfBirth = dayjs(clone.dateOfBirth);
+    // Ensure at least one empty emergency contact if none exist
+    if (!clone.emergencyContacts || clone.emergencyContacts.length === 0) {
+      clone.emergencyContacts = [{}];
+    }
     return clone;
   }, [initialValues]);
 
@@ -209,7 +217,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
       <Divider />
 
       <Typography.Title level={4}>Emergency Contacts</Typography.Title>
-      <EmergencyContactForm />
+      <EmergencyContactForm readOnly={readOnly} />
 
       <Divider />
 

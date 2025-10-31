@@ -32,7 +32,6 @@ export default function ProtectedRoute({ requireHR = false, fallback = '/auth/lo
   // For employees: check onboarding status and restrict access if not approved
   if (!requireHR && !isHR) {
     // Show loading only if we're actively fetching and don't have data yet
-    // Give it a timeout - if we're stuck loading, allow access (fail open)
     if (onboardingStatus === 'loading' && !onboardingData) {
       return (
         <div style={{ display: 'grid', placeItems: 'center', padding: 48 }}>
@@ -41,28 +40,21 @@ export default function ProtectedRoute({ requireHR = false, fallback = '/auth/lo
       );
     }
 
-    // If we have data (regardless of status), use it for access control
-    if (onboardingData) {
+    // Only redirect if we have valid onboarding data with a non-approved status
+    // This prevents redirecting when data is temporarily unavailable
+    if (onboardingData && onboardingData.status) {
       const status = onboardingData.status;
       const isOnboardingPage = location.pathname === '/employee/onboarding';
       
-      // If onboarding is not approved (never_submitted, pending, rejected)
-      // and user is trying to access a different page, redirect to onboarding
+      // Only redirect if status is explicitly not approved and we're not on onboarding page
+      // Don't redirect if status is 'approved' or undefined
       if ((status === 'never_submitted' || status === 'pending' || status === 'rejected') && !isOnboardingPage) {
         return <Navigate to="/employee/onboarding" replace />;
       }
-      
-      // Otherwise allow access
-      return <Outlet />;
     }
 
-    // If fetch failed or status is idle (not yet fetched), allow access (fail open)
-    // The login page will handle fetching and redirect
-    if (onboardingStatus === 'failed' || onboardingStatus === 'idle') {
-      return <Outlet />;
-    }
-
-    // Default: allow access if we're unsure
+    // For all other cases (failed, idle, approved, or no data), allow access
+    // This prevents blank pages when onboarding data is temporarily unavailable
     return <Outlet />;
   }
 

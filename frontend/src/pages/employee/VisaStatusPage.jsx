@@ -52,8 +52,13 @@ export default function VisaStatusPage() {
   const docsStatus = useSelector(selectMyDocumentsStatus);
 
   useEffect(() => {
-    if (!profile) dispatch(fetchMyProfile());
     dispatch(fetchMyDocuments());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!profile) {
+      dispatch(fetchMyProfile());
+    }
   }, [dispatch, profile]);
 
   const docsByType = useMemo(() => {

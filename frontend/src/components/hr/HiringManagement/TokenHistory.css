@@ -8,6 +8,14 @@
   padding: 24px;
 }
 
+/* Table wrapper for horizontal scrolling */
+.token-history-table-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  width: 100%;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+}
+
 /* Mobile devices */
 @media (max-width: 767px) {
   .token-history-card .ant-card-body {
@@ -31,6 +39,17 @@
 @media (min-width: 768px) and (max-width: 1023px) {
   .token-history-card .ant-card-body {
     padding: 16px;
+  }
+}
+
+/* Large screens - ensure table uses full width */
+@media (min-width: 992px) {
+  .token-history-card {
+    min-width: 0; /* Allow flex shrinking */
+  }
+  
+  .token-history-card .ant-card-body {
+    padding: 24px;
   }
 }
 

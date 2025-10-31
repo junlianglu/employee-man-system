@@ -82,13 +82,13 @@ export default function DocumentModal({
               </Select.Option>
             </Select>
           ) : (
-            <Select placeholder="Select type">
-              {allowedTypes.map((t) => (
-                <Select.Option key={t} value={t}>
-                  {t.replace(/_/g, ' ')}
-                </Select.Option>
-              ))}
-            </Select>
+          <Select placeholder="Select type">
+            {allowedTypes.map((t) => (
+              <Select.Option key={t} value={t}>
+                {t.replace(/_/g, ' ')}
+              </Select.Option>
+            ))}
+          </Select>
           )}
         </Form.Item>
 

@@ -68,50 +68,50 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
       ) : null}
       {showAccount && (
         <>
-          <Typography.Title level={4} style={{ marginTop: 0 }}>Account</Typography.Title>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                name="username"
-                label="Username"
-                rules={[{ required: true, message: 'Username is required' }, { min: 3 }, { max: 32 }]}
-              >
-                <Input placeholder="Choose a username" autoComplete="username" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                name="password"
-                label="Password"
-                rules={[{ required: true, message: 'Password is required' }, { min: 6 }]}
-                hasFeedback
-              >
-                <Input.Password autoComplete="new-password" placeholder="Enter a strong password" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={12}>
-              <Form.Item
-                name="confirmPassword"
-                label="Confirm Password"
-                dependencies={["password"]}
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Please confirm your password' },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue('password') === value) return Promise.resolve();
-                      return Promise.reject(new Error('Passwords do not match'));
-                    },
-                  }),
-                ]}
-              >
-                <Input.Password autoComplete="new-password" placeholder="Re-enter password" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Divider />
+      <Typography.Title level={4} style={{ marginTop: 0 }}>Account</Typography.Title>
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: 'Username is required' }, { min: 3 }, { max: 32 }]}
+          >
+            <Input placeholder="Choose a username" autoComplete="username" />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: 'Password is required' }, { min: 6 }]}
+            hasFeedback
+          >
+            <Input.Password autoComplete="new-password" placeholder="Enter a strong password" />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="confirmPassword"
+            label="Confirm Password"
+            dependencies={["password"]}
+            hasFeedback
+            rules={[
+              { required: true, message: 'Please confirm your password' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) return Promise.resolve();
+                  return Promise.reject(new Error('Passwords do not match'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password autoComplete="new-password" placeholder="Re-enter password" />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Divider />
         </>
       )}
 
@@ -222,16 +222,16 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
       <Divider />
 
       {!readOnly && showActions && (
-        <Row justify="end" gutter={8}>
-          <Col>
-            <Button onClick={() => form.resetFields()} disabled={submitting}>Reset</Button>
-          </Col>
-          <Col>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              Submit
-            </Button>
-          </Col>
-        </Row>
+      <Row justify="end" gutter={8}>
+        <Col>
+          <Button onClick={() => form.resetFields()} disabled={submitting}>Reset</Button>
+        </Col>
+        <Col>
+          <Button type="primary" htmlType="submit" loading={submitting}>
+            Submit
+          </Button>
+        </Col>
+      </Row>
       )}
     </Form>
   );

@@ -125,9 +125,9 @@ export const completeRegistration = async (token, employeeData) => {
   if (!employeeData?.username || !employeeData?.password) {
     throw new Error('Username and password are required');
   }
-
+  
   const hashedPassword = await hashPassword(employeeData.password);
-
+  
   const employee = new Employee({
     email: registrationToken.email,
     username: employeeData.username,
@@ -138,11 +138,11 @@ export const completeRegistration = async (token, employeeData) => {
     lastName: registrationToken.lastName,
     // onboardingReview defaults to never_submitted per schema
   });
-
+  
   await employee.save();
-
+  
   registrationToken.submittedAt = new Date();
   await registrationToken.save();
-
+  
   return employee;
 };

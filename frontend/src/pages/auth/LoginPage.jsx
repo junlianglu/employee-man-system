@@ -31,7 +31,7 @@ export default function LoginPage() {
             }
           } catch {
             const to = location.state?.from?.pathname || '/employee';
-            navigate(to, { replace: true });
+      navigate(to, { replace: true });
           }
         })();
       }

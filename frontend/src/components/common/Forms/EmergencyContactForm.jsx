@@ -92,30 +92,30 @@ export default function EmergencyContactForm({ name = 'emergencyContacts', min =
                 </Col>
               </Row>
               {!isReadOnly && (
-                <div>
-                  <Button
-                    danger
-                    type="text"
-                    icon={<MinusCircleOutlined />}
-                    onClick={() => remove(itemName)}
-                    disabled={fields.length <= min}
-                  >
-                    Remove this contact
-                  </Button>
-                </div>
+              <div>
+                <Button
+                  danger
+                  type="text"
+                  icon={<MinusCircleOutlined />}
+                  onClick={() => remove(itemName)}
+                  disabled={fields.length <= min}
+                >
+                  Remove this contact
+                </Button>
+              </div>
               )}
             </Space>
           ))}
           {!isReadOnly && (
-            <Button
-              type="dashed"
-              onClick={() => add()}
-              block
-              icon={<PlusOutlined />}
-              disabled={fields.length >= max}
-            >
-              Add emergency contact
-            </Button>
+          <Button
+            type="dashed"
+            onClick={() => add()}
+            block
+            icon={<PlusOutlined />}
+            disabled={fields.length >= max}
+          >
+            Add emergency contact
+          </Button>
           )}
           <Form.ErrorList errors={errors} />
         </>

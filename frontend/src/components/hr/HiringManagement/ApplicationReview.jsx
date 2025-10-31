@@ -37,14 +37,14 @@ export default function ApplicationReview({
   );
 
   return (
-    <Card title={listHeader} bodyStyle={{ paddingTop: 0 }}>
-      <List
-        loading={listLoading}
-        dataSource={applications}
-        rowKey={(r) => r._id}
-        renderItem={(e) => (
-          <List.Item
-            actions={[
+        <Card title={listHeader} bodyStyle={{ paddingTop: 0 }}>
+          <List
+            loading={listLoading}
+            dataSource={applications}
+            rowKey={(r) => r._id}
+            renderItem={(e) => (
+              <List.Item
+                actions={[
               <Button 
                 type="link" 
                 icon={<EyeOutlined />} 
@@ -53,28 +53,28 @@ export default function ApplicationReview({
                 }}
               >
                 View Application
-              </Button>,
-            ]}
-          >
-            <List.Item.Meta
-              title={
-                <Space>
-                  <Typography.Text strong>
-                    {e.firstName} {e.lastName}
-                  </Typography.Text>
-                  {statusTag(e.onboardingReview?.status)}
-                </Space>
-              }
-              description={
-                <Space direction="vertical" size={0}>
-                  <Typography.Text type="secondary">{e.email}</Typography.Text>
-                  <Typography.Text type="secondary">@{e.username}</Typography.Text>
-                </Space>
-              }
-            />
-          </List.Item>
-        )}
-      />
-    </Card>
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      <Typography.Text strong>
+                        {e.firstName} {e.lastName}
+                      </Typography.Text>
+                      {statusTag(e.onboardingReview?.status)}
+                    </Space>
+                  }
+                  description={
+                    <Space direction="vertical" size={0}>
+                      <Typography.Text type="secondary">{e.email}</Typography.Text>
+                      <Typography.Text type="secondary">@{e.username}</Typography.Text>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        </Card>
   );
 }

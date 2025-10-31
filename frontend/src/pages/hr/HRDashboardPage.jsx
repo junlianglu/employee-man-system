@@ -21,7 +21,7 @@ export default function HRDashboardPage() {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <Card bordered={false}>
-        <Title level={3} style={{ margin: 0 }}>HR Dashboard</Title>
+      <Title level={3} style={{ margin: 0 }}>HR Dashboard</Title>
       </Card>
 
       <Row gutter={[16, 16]}>
@@ -38,14 +38,14 @@ export default function HRDashboardPage() {
                   <Typography.Title level={4} style={{ margin: 0 }}>
                     {item.label}
                   </Typography.Title>
-                </Space>
+            </Space>
                 <Typography.Text type="secondary">{item.description}</Typography.Text>
                 <Button type="primary" block onClick={() => navigate(item.to)}>
                   Go to {item.label}
                 </Button>
-              </Space>
-            </Card>
-          </Col>
+            </Space>
+          </Card>
+        </Col>
         ))}
       </Row>
     </Space>

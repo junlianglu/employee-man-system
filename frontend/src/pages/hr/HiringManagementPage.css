@@ -1,0 +1,12 @@
+/* Responsive padding for Hiring Management page */
+.hiring-management-container {
+  padding: 16px;
+}
+
+/* Mobile devices */
+@media (max-width: 767px) {
+  .hiring-management-container {
+    padding: 8px;
+  }
+}
+

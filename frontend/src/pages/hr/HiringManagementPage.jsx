@@ -4,6 +4,7 @@ import { Row, Col, message } from 'antd';
 import TokenGenerator from '../../components/hr/HiringManagement/TokenGenerator.jsx';
 import TokenHistory from '../../components/hr/HiringManagement/TokenHistory.jsx';
 import ApplicationReview from '../../components/hr/HiringManagement/ApplicationReview.jsx';
+import './HiringManagementPage.css';
 
 import {
   fetchRegistrationTokens,
@@ -60,7 +61,7 @@ export default function HiringManagementPage() {
   const handleRefreshList = () => dispatch(fetchOnboardingApplications(filter));
 
   return (
-    <Row gutter={[16, 16]} style={{ padding: 16 }}>
+    <Row gutter={[16, 16]} className="hiring-management-container">
       <Col xs={24} lg={10}>
         <TokenGenerator
           loading={createStatus === 'loading'}

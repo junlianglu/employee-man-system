@@ -41,16 +41,28 @@ export default function DocumentList({
   const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
-    if (documents) return;
-    if (isHR && employeeId) {
-      dispatch(fetchEmployeeDocuments(employeeId));
-    } else if (!isHR) {
-      dispatch(fetchMyDocuments());
+    // If documents prop is provided (including empty array), don't fetch
+    if (documents !== undefined) return;
+    
+    // Only fetch if status is 'idle' (not yet fetched)
+    const currentStatus = isHR ? empStatus : myStatus;
+    if (currentStatus === 'idle') {
+      if (isHR && employeeId) {
+        dispatch(fetchEmployeeDocuments(employeeId)).catch((err) => {
+          console.error('Failed to fetch employee documents:', err);
+        });
+      } else if (!isHR) {
+        dispatch(fetchMyDocuments()).catch((err) => {
+          console.error('Failed to fetch my documents:', err);
+        });
+      }
     }
-  }, [dispatch, isHR, employeeId, documents]);
+  }, [dispatch, isHR, employeeId, documents, empStatus, myStatus]);
 
   const data = useMemo(() => {
-    if (documents) return documents;
+    // If documents prop is explicitly provided (including empty array), use it
+    if (documents !== undefined) return documents;
+    // Otherwise, use fetched data (will be empty array if no documents)
     return isHR ? empDocs : myDocs;
   }, [documents, isHR, myDocs, empDocs]);
 
@@ -78,12 +90,16 @@ export default function DocumentList({
       dataIndex: 'type',
       key: 'type',
       render: (v) => typeLabel(v),
+      width: 120,
+      responsive: ['xs', 'sm', 'md', 'lg'],
     },
     {
       title: 'File',
       dataIndex: 'fileName',
       key: 'fileName',
       render: (v) => (v ? <Text code>{v}</Text> : <Text type="secondary">N/A</Text>),
+      ellipsis: true,
+      responsive: ['xs', 'sm', 'md', 'lg'],
     },
     {
       title: 'Status',
@@ -92,12 +108,14 @@ export default function DocumentList({
       render: (_, record) => (
         <DocumentStatus status={record.status} hrFeedback={record.hrFeedback} />
       ),
+      width: 120,
+      responsive: ['xs', 'sm', 'md', 'lg'],
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <Space>
+        <Space size="small" wrap>
           <Button size="small" onClick={() => handlePreview(record)} disabled={!record.fileName}>
             Preview
           </Button>
@@ -119,24 +137,32 @@ export default function DocumentList({
           )}
         </Space>
       ),
+      width: isHR ? 250 : 100,
+      responsive: ['xs', 'sm', 'md', 'lg'],
     },
     {
       title: 'Updated',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       render: (v) => (v ? new Date(v).toLocaleString() : '-'),
+      width: 160,
+      responsive: ['sm', 'md', 'lg'], // Hide on xs (mobile)
     },
   ];
 
   return (
     <>
-      <Table
-        rowKey={(r) => r._id || `${r.type}-${r.fileName || 'none'}`}
-        columns={columns}
-        dataSource={data || []}
-        loading={tableLoading}
-        pagination={false}
-      />
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          rowKey={(r) => r._id || `${r.type}-${r.fileName || 'none'}`}
+          columns={columns}
+          dataSource={data || []}
+          loading={tableLoading}
+          pagination={false}
+          scroll={{ x: 'max-content' }}
+          size="middle"
+        />
+      </div>
 
       <DocumentPreview
         open={previewOpen}

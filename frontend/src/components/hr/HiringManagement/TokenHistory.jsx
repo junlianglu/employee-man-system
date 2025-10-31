@@ -1,5 +1,6 @@
 import { Card, Table, Tag, Space, Button, Typography } from 'antd';
 import { ReloadOutlined, CopyOutlined, LinkOutlined } from '@ant-design/icons';
+import './TokenHistory.css';
 
 function statusTag(row) {
   if (row.submittedAt) return <Tag color="green">Used</Tag>;
@@ -20,58 +21,119 @@ export default function TokenHistory({
         <span>{r.firstName} {r.middleName ? `${r.middleName} ` : ''}{r.lastName}</span>
       ),
       ellipsis: true,
+      width: 140,
+      responsive: ['xs', 'sm', 'md', 'lg'],
     },
-    { title: 'Email', dataIndex: 'email', key: 'email', ellipsis: true },
+    { 
+      title: 'Email', 
+      dataIndex: 'email', 
+      key: 'email', 
+      ellipsis: true,
+      width: 180,
+      responsive: ['xs', 'sm', 'md', 'lg'],
+    },
     {
       title: 'Token',
       key: 'token',
       render: (_, r) => (
-        <Space>
-          <Typography.Text code ellipsis style={{ maxWidth: 160, display: 'inline-block' }}>
+        <Space size="small" wrap>
+          <Typography.Text code ellipsis style={{ maxWidth: 100, display: 'inline-block' }}>
             {r.token}
           </Typography.Text>
-          <Button size="small" icon={<CopyOutlined />} onClick={() => navigator.clipboard.writeText(r.token)}>
+          <Button 
+            size="small" 
+            icon={<CopyOutlined />} 
+            onClick={() => navigator.clipboard.writeText(r.token)}
+            title="Copy token"
+          >
             Copy
           </Button>
         </Space>
       ),
+      width: 160,
+      responsive: ['md', 'lg'],
     },
     {
       title: 'Link',
       key: 'link',
       render: (_, r) => (
-        <Space>
+        <Space size="small" wrap>
           <Typography.Link href={r.registrationLink} target="_blank">
             <LinkOutlined /> Open
           </Typography.Link>
-          <Button size="small" icon={<CopyOutlined />} onClick={() => navigator.clipboard.writeText(r.registrationLink)}>
+          <Button 
+            size="small" 
+            icon={<CopyOutlined />} 
+            onClick={() => navigator.clipboard.writeText(r.registrationLink)}
+            title="Copy link"
+          >
             Copy
           </Button>
         </Space>
       ),
+      width: 140,
+      responsive: ['md', 'lg'],
     },
-    { title: 'Created', dataIndex: 'createdAt', key: 'createdAt', render: (v) => v ? new Date(v).toLocaleString() : '—' },
-    { title: 'Expires', dataIndex: 'expiresAt', key: 'expiresAt', render: (v) => v ? new Date(v).toLocaleString() : '—' },
-    { title: 'Submitted', dataIndex: 'submittedAt', key: 'submittedAt', render: (v) => v ? new Date(v).toLocaleString() : '—' },
-    { title: 'Status', key: 'status', render: (_, r) => statusTag(r) },
+    { 
+      title: 'Created', 
+      dataIndex: 'createdAt', 
+      key: 'createdAt', 
+      render: (v) => v ? new Date(v).toLocaleString() : '—',
+      width: 160,
+      responsive: ['sm', 'md', 'lg'],
+    },
+    { 
+      title: 'Expires', 
+      dataIndex: 'expiresAt', 
+      key: 'expiresAt', 
+      render: (v) => v ? new Date(v).toLocaleString() : '—',
+      width: 160,
+      responsive: ['lg'],
+    },
+    { 
+      title: 'Submitted', 
+      dataIndex: 'submittedAt', 
+      key: 'submittedAt', 
+      render: (v) => v ? new Date(v).toLocaleString() : '—',
+      width: 160,
+      responsive: ['lg'],
+    },
+    { 
+      title: 'Status', 
+      key: 'status', 
+      render: (_, r) => statusTag(r),
+      width: 100,
+      responsive: ['xs', 'sm', 'md', 'lg'],
+    },
   ];
 
   return (
     <Card
       title="Token History"
       extra={
-        <Button icon={<ReloadOutlined />} onClick={onRefresh} disabled={loading} loading={loading}>
-          Refresh
+        <Button 
+          icon={<ReloadOutlined />} 
+          onClick={onRefresh} 
+          disabled={loading} 
+          loading={loading}
+          size="small"
+        >
+          <span className="responsive-button-text">Refresh</span>
         </Button>
       }
+      className="token-history-card"
     >
-      <Table
-        rowKey={(r) => r._id || `${r.email}-${r.token}`}
-        columns={columns}
-        dataSource={tokens}
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-      />
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          rowKey={(r) => r._id || `${r.email}-${r.token}`}
+          columns={columns}
+          dataSource={tokens}
+          loading={loading}
+          pagination={{ pageSize: 10, showSizeChanger: false }}
+          scroll={{ x: 'max-content' }}
+          size="middle"
+        />
+      </div>
     </Card>
   );
 }

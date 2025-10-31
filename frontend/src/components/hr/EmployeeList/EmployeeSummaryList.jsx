@@ -1,4 +1,5 @@
 import { Table, Typography, Tag, Space } from 'antd';
+import './EmployeeSummaryList.css';
 
 const { Text } = Typography;
 
@@ -53,20 +54,28 @@ export default function EmployeeSummaryList({
         return aLast.localeCompare(bLast);
       },
       defaultSortOrder: 'ascend',
+      width: 150,
+      minWidth: 120,
+      fixed: 'left',
     },
     {
       title: 'SSN',
       dataIndex: 'ssn',
       key: 'ssn',
       render: (ssn) => ssn || <Text type="secondary">N/A</Text>,
+      width: 120,
+      minWidth: 100,
     },
     {
       title: 'Work Authorization Title',
       key: 'workAuth',
       render: (_, record) => {
         const title = getWorkAuthTitle(record);
-        return <Text>{title}</Text>;
+        return <Text ellipsis style={{ maxWidth: 150 }}>{title}</Text>;
       },
+      width: 180,
+      minWidth: 150,
+      ellipsis: true,
     },
     {
       title: 'Phone Number',
@@ -75,12 +84,17 @@ export default function EmployeeSummaryList({
         const phone = record?.cellPhone || record?.workPhone;
         return phone ? <Text>{phone}</Text> : <Text type="secondary">N/A</Text>;
       },
+      width: 140,
+      minWidth: 120,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
       render: (email) => email || <Text type="secondary">N/A</Text>,
+      width: 200,
+      minWidth: 150,
+      ellipsis: true,
     },
   ];
 
@@ -99,14 +113,17 @@ export default function EmployeeSummaryList({
         <Text strong>Total Employees: </Text>
         <Text>{total || sortedItems.length}</Text>
       </div>
-      <Table
-        columns={columns}
-        dataSource={sortedItems}
-        rowKey={(record) => record._id}
-        loading={loading}
-        pagination={false}
-        size="middle"
-      />
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          columns={columns}
+          dataSource={sortedItems}
+          rowKey={(record) => record._id}
+          loading={loading}
+          pagination={false}
+          size="middle"
+          scroll={{ x: 'max-content' }}
+        />
+      </div>
     </Space>
   );
 }

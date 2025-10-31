@@ -1,0 +1,45 @@
+/* Responsive design for Employee Profiles page */
+.employee-profiles-page {
+  width: 100%;
+  padding: 16px;
+}
+
+.employee-profiles-card {
+  width: 100%;
+  overflow: hidden;
+}
+
+.employee-profiles-card .ant-card-body {
+  padding: 24px;
+}
+
+/* Mobile devices */
+@media (max-width: 767px) {
+  .employee-profiles-page {
+    padding: 8px;
+  }
+
+  .employee-profiles-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .employee-profiles-card .ant-card-head {
+    padding: 0 12px;
+  }
+
+  .employee-profiles-card .ant-card-head-title {
+    font-size: 16px;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .employee-profiles-page {
+    padding: 12px;
+  }
+
+  .employee-profiles-card .ant-card-body {
+    padding: 16px;
+  }
+}
+

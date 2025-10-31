@@ -1,4 +1,3 @@
-// frontend/src/components/common/Documents/DocumentUpload.jsx
 import React, { useMemo, useState, useEffect } from 'react';
 import { Upload, Select, Button, Form, Space, message, Typography, Card } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
@@ -16,9 +15,9 @@ const typeLabel = (t) =>
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function DocumentUpload({ 
-  restrictedType,  // When provided, locks upload to this type only
-  showTypeSelect = true,  // When false, hides the type selector (for restrictedType)
-  compact = false  // If true, removes Card wrapper for inline use
+  restrictedType,  
+  showTypeSelect = true,  
+  compact = false  
 }) {
   const dispatch = useDispatch();
   const uploadStatus = useSelector(selectMyUploadStatus);
@@ -26,7 +25,7 @@ export default function DocumentUpload({
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
-  // If restrictedType is provided, auto-set it in form
+
   useEffect(() => {
     if (restrictedType) {
       form.setFieldsValue({ type: restrictedType });

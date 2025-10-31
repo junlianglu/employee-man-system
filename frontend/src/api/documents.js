@@ -5,6 +5,7 @@ const ALLOWED_TYPES = [
   'opt_receipt', 'opt_ead', 'i983', 'i20'
 ];
 
+
 async function fetchBlob(path, { method = 'GET', signal } = {}) {
   const url = path.startsWith('http') ? path : `${BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
   const headers = new Headers();
@@ -38,6 +39,10 @@ async function fetchBlob(path, { method = 'GET', signal } = {}) {
   const filename = match ? decodeURIComponent(match[1]) : 'document';
 
   return { blob, contentType, filename };
+}
+
+async function downloadTemplate(templateName) {
+  return fetchBlob(`/api/documents/templates/${templateName}`, { method: 'GET' });
 }
 
 
@@ -94,4 +99,5 @@ export {
   downloadDocument,
   hrViewDocument,
   hrDownloadDocument,
+  downloadTemplate,
 };

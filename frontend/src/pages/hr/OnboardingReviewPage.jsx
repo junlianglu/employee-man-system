@@ -39,7 +39,10 @@ export default function OnboardingReviewPage() {
   useEffect(() => {
     if (employeeId) {
       dispatch(fetchOnboardingApplicationDetail(employeeId));
-      dispatch(fetchEmployeeDocuments(employeeId));
+      dispatch(fetchEmployeeDocuments(employeeId)).catch((err) => {
+        console.error('Failed to fetch employee documents:', err);
+        // Don't show error message here as it might be expected for employees with no documents
+      });
     }
   }, [dispatch, employeeId]);
 
@@ -172,8 +175,15 @@ export default function OnboardingReviewPage() {
           />
         </Card>
 
-        <Card title="Uploaded Documents" loading={employeeDocsStatus === 'loading'}>
-          {employeeDocs && employeeDocs.length > 0 ? (
+        <Card 
+          title="Uploaded Documents" 
+          loading={employeeDocsStatus === 'loading'}
+        >
+          {employeeDocsStatus === 'loading' ? (
+            <Typography.Text type="secondary">Loading documents...</Typography.Text>
+          ) : employeeDocsStatus === 'failed' ? (
+            <Typography.Text type="danger">Failed to load documents</Typography.Text>
+          ) : employeeDocs && employeeDocs.length > 0 ? (
             <List
               dataSource={employeeDocs}
               rowKey={(d) => d._id}

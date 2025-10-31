@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Typography, Space, Card, Alert } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import './EmployeeProfilesPage.css';
 
 import { fetchEmployees } from '../../features/employee/employeeThunks.js';
 import {
@@ -67,16 +68,6 @@ export default function EmployeeProfilesPage() {
 
   const loading = employeesStatus === 'loading';
 
-  const handleSearch = (values) => {
-    setQuery((q) => ({
-      ...q,
-      page: 1,
-      search: values.search,
-      //status: values.status,
-      //visa: values.visa,
-    }));
-  };
-
   const handleChangePage = (page) => {
     setQuery((q) => ({ ...q, page }));
   };
@@ -105,27 +96,28 @@ export default function EmployeeProfilesPage() {
   }, [realTimeSearch, filteredItems.length]);
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Typography>
-        <Title level={3} style={{ margin: 0 }}>Employees</Title>
-        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          Search, filter, and browse employee profiles.
-        </Paragraph>
-      </Typography>
+    <div className="employee-profiles-page">
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Typography>
+          <Title level={3} style={{ margin: 0 }}>Employees</Title>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            Search, filter, and browse employee profiles.
+          </Paragraph>
+        </Typography>
 
-      <Card bordered={false}>
-        <EmployeeSearch
-          initial={{ search: query.search }}
-          onSearch={handleSearch}
-          onSearchChange={handleRealTimeSearch}
-        />
-        {searchResultMessage}
-        <EmployeeSummaryList
-          items={filteredItems}
-          loading={loading}
-          total={pagination?.total || filteredItems.length}
-        />
-      </Card>
-    </Space>
+        <Card bordered={false} className="employee-profiles-card">
+          <EmployeeSearch
+            initial={{ search: query.search }}
+            onSearchChange={handleRealTimeSearch}
+          />
+          {searchResultMessage}
+          <EmployeeSummaryList
+            items={filteredItems}
+            loading={loading}
+            total={pagination?.total || filteredItems.length}
+          />
+        </Card>
+      </Space>
+    </div>
   );
 }

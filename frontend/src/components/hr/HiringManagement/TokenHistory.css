@@ -1,0 +1,43 @@
+/* Responsive design for Token History card */
+.token-history-card {
+  width: 100%;
+  overflow: hidden;
+}
+
+.token-history-card .ant-card-body {
+  padding: 24px;
+}
+
+/* Mobile devices */
+@media (max-width: 767px) {
+  .token-history-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .token-history-card .ant-card-head {
+    padding: 0 12px;
+  }
+
+  .token-history-card .ant-card-head-title {
+    font-size: 16px;
+  }
+
+  .responsive-button-text {
+    display: none;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .token-history-card .ant-card-body {
+    padding: 16px;
+  }
+}
+
+/* Small mobile - hide button text on very small screens */
+@media (max-width: 575px) {
+  .token-history-card .ant-card-extra {
+    padding-left: 8px;
+  }
+}
+

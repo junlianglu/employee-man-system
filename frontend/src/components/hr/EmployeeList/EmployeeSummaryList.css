@@ -1,0 +1,31 @@
+/* Responsive design for Employee Summary List */
+
+/* Mobile devices - adjust table spacing */
+@media (max-width: 767px) {
+  /* Ensure table fits on mobile */
+  .ant-table-wrapper {
+    font-size: 12px;
+  }
+
+  .ant-table-thead > tr > th {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ant-table-thead > tr > th {
+    padding: 10px 8px;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 10px 8px;
+  }
+}
+

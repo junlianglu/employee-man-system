@@ -96,21 +96,12 @@ export default function VisaStatusList({
         style={{ marginBottom: 16 }}
       >
         <Row gutter={12}>
-          <Col xs={24} md={12}>
+          <Col xs={24} md={16}>
             <Form.Item name="search" label="Search">
-              <Input placeholder="Name, email or username" allowClear />
+              <Input placeholder="first name, last name, preferred name" allowClear />
             </Form.Item>
           </Col>
-          <Col xs={24} md={8}>
-            <Form.Item name="status" label="Citizenship/Work Auth">
-              <Select allowClear placeholder="All">
-                <Select.Option value="citizen">U.S. Citizen</Select.Option>
-                <Select.Option value="permanent_resident">Permanent Resident</Select.Option>
-                <Select.Option value="work_visa">Work Visa</Select.Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={4} style={{ display: 'flex', alignItems: 'end' }}>
+          <Col xs={24} md={8} style={{ display: 'flex', alignItems: 'end' }}>
             <Space>
               <Button icon={<ReloadOutlined />} onClick={() => { form.resetFields(); onSearch?.({}); }}>
                 Reset

@@ -28,8 +28,8 @@ export default function EmployeeProfilesPage() {
     page: 1,
     limit: 1000, // Fetch all for summary view sorting
     search: undefined,
-    status: undefined,
-    visa: undefined, 
+    //status: undefined,
+    //visa: undefined, 
   });
 
   const [realTimeSearch, setRealTimeSearch] = useState('');
@@ -72,8 +72,8 @@ export default function EmployeeProfilesPage() {
       ...q,
       page: 1,
       search: values.search,
-      status: values.status,
-      visa: values.visa,
+      //status: values.status,
+      //visa: values.visa,
     }));
   };
 
@@ -115,7 +115,7 @@ export default function EmployeeProfilesPage() {
 
       <Card bordered={false}>
         <EmployeeSearch
-          initial={{ search: query.search, status: query.status, visa: query.visa }}
+          initial={{ search: query.search }}
           onSearch={handleSearch}
           onSearchChange={handleRealTimeSearch}
         />

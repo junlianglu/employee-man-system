@@ -1,4 +1,4 @@
-import { Form, Input, Select, Row, Col, Button } from 'antd';
+import { Form, Input, Row, Col, Button, Space } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 
@@ -58,36 +58,15 @@ export default function EmployeeSearch({ initial = {}, onSearch, onSearchChange 
             />
           </Form.Item>
         </Col>
-        <Col xs={24} md={7}>
-          <Form.Item name="status" label="Onboarding Status">
-            <Select allowClear placeholder="All">
-              <Select.Option value="never_submitted">Never submitted</Select.Option>
-              <Select.Option value="pending">Pending</Select.Option>
-              <Select.Option value="approved">Approved</Select.Option>
-              <Select.Option value="rejected">Rejected</Select.Option>
-            </Select>
-          </Form.Item>
-        </Col>
-        <Col xs={24} md={7}>
-          <Form.Item name="visa" label="Citizenship/Work Auth">
-            <Select allowClear placeholder="All">
-              <Select.Option value="citizen">U.S. Citizen</Select.Option>
-              <Select.Option value="permanent_resident">Permanent Resident</Select.Option>
-              <Select.Option value="work_visa">Work Visa</Select.Option>
-            </Select>
-          </Form.Item>
-        </Col>
-      </Row>
-      <Row justify="end" gutter={8}>
-        <Col>
-          <Button icon={<ReloadOutlined />} onClick={() => { form.resetFields(); onSearch?.({}); }}>
-            Reset
-          </Button>
-        </Col>
-        <Col>
-          <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-            Search
-          </Button>
+        <Col xs={24} md={6} style={{ display: 'flex', alignItems: 'end' }}>
+          <Space>
+            <Button icon={<ReloadOutlined />} onClick={() => { form.resetFields(); onSearch?.({}); }}>
+              Reset
+            </Button>
+            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+              Search
+            </Button>
+          </Space>
         </Col>
       </Row>
     </Form>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Form, Input, Select, Button, Space, message, Row, Col, DatePicker, Typography, Popconfirm, Avatar } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, UserOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProfile, updateMyProfileThunk } from '../../../features/employee/employeeThunks.js';
@@ -119,12 +119,15 @@ export default function NameSection() {
   const profilePictureDoc = documents?.find(d => d.type === 'profile_picture');
 
   // Get the full URL for the profile picture
+  // Uses the static file path since backend serves /uploads as static files
   const getProfilePictureUrl = () => {
     if (!profilePictureDoc?._id || !profilePictureDoc?.fileUrl) return undefined;
+    
     // If fileUrl is already a full URL, return it; otherwise prepend BASE_URL
     if (profilePictureDoc.fileUrl.startsWith('http')) {
       return profilePictureDoc.fileUrl;
     }
+    // fileUrl is typically like "/uploads/filename.jpg"
     return `${BASE_URL}${profilePictureDoc.fileUrl.startsWith('/') ? '' : '/'}${profilePictureDoc.fileUrl}`;
   };
 
@@ -247,14 +250,13 @@ export default function NameSection() {
                     <Avatar
                       size={120}
                       src={getProfilePictureUrl()}
+                      icon={<UserOutlined />}
                       style={{ 
                         border: '2px solid #d9d9d9',
                         display: 'block'
                       }}
-                      icon={!profilePictureDoc?._id ? <EditOutlined /> : undefined}
-                    >
-                      {!profilePictureDoc?._id ? getInitials() : null}
-                    </Avatar>
+                      onError={() => false}
+                    />
                   </div>
                 </div>
               </Col>
@@ -343,14 +345,13 @@ export default function NameSection() {
                     <Avatar
                       size={120}
                       src={getProfilePictureUrl()}
+                      icon={<UserOutlined />}
                       style={{ 
                         border: '2px solid #d9d9d9',
                         display: 'block'
                       }}
-                      icon={!profilePictureDoc?._id ? <EditOutlined /> : undefined}
-                    >
-                      {!profilePictureDoc?._id ? getInitials() : null}
-                    </Avatar>
+                      onError={() => false}
+                    />
                     <Button
                       type="dashed"
                       onClick={() => setProfilePicModal({ open: true, doc: profilePictureDoc || { type: 'profile_picture' } })}

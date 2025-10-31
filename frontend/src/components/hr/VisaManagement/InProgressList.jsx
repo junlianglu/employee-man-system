@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
-import { Card, Table, Button, Space, Typography, Input } from 'antd';
+import { Card, Table, Button, Space, Typography } from 'antd';
 import { EyeOutlined, SendOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import './InProgressList.css';
 
 const { Text } = Typography;
 
@@ -18,19 +17,7 @@ export default function InProgressList({
   onChangePage,
   onViewDocument,
   onSendNotification,
-  searchValue = '',
-  onSearchChange,
 }) {
-  const filteredItems = useMemo(() => {
-    if (!searchValue?.trim()) return items;
-    const searchLower = searchValue.toLowerCase().trim();
-    return items.filter((e) => {
-      const firstName = (e?.firstName || '').toLowerCase();
-      const lastName = (e?.lastName || '').toLowerCase();
-      const preferredName = (e?.preferredName || '').toLowerCase();
-      return firstName.includes(searchLower) || lastName.includes(searchLower) || preferredName.includes(searchLower);
-    });
-  }, [items, searchValue]);
 
   const columns = useMemo(() => [
     {
@@ -134,32 +121,16 @@ export default function InProgressList({
   ], [onViewDocument, onSendNotification]);
 
   return (
-    <Card
-      title="In Progress - OPT Documents"
-      extra={
-        <Input.Search
-          placeholder="Search by name..."
-          value={searchValue}
-          onChange={(e) => onSearchChange?.(e.target.value)}
-          allowClear
-          style={{ width: '100%', maxWidth: 250 }}
-          className="in-progress-search"
-        />
-      }
-      className="in-progress-list-card"
-    >
-      {filteredItems.length === 0 && !loading && (
+    <Card title="In Progress - OPT Documents">
+      {items.length === 0 && !loading && (
         <div style={{ textAlign: 'center', padding: 40 }}>
-          <Text type="secondary">
-            {searchValue ? 'No employees found matching your search.' : 'No employees in progress.'}
-          </Text>
+          <Text type="secondary">No employees in progress.</Text>
         </div>
       )}
-      <div style={{ overflowX: 'auto' }}>
-        <Table
-          rowKey={(r) => r._id || `token-${r.email}`}
-          columns={columns}
-          dataSource={filteredItems}
+      <Table
+        rowKey={(r) => r._id || `token-${r.email}`}
+        columns={columns}
+        dataSource={items}
           loading={loading}
           pagination={pagination ? {
             current: pagination.page || 1,
@@ -171,7 +142,6 @@ export default function InProgressList({
           scroll={{ x: 'max-content' }}
           size="middle"
         />
-      </div>
     </Card>
   );
 }

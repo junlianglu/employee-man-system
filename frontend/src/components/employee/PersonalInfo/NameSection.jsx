@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Card, Form, Input, Select, Button, Space, message, Row, Col } from 'antd';
+import { Card, Form, Input, Select, Button, Space, message, Row, Col, DatePicker } from 'antd';
+import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProfile, updateMyProfileThunk } from '../../../features/employee/employeeThunks.js';
 import { selectMyProfile, selectMyProfileStatus, selectMyProfileUpdateStatus } from '../../../features/employee/employeeSelectors.js';
@@ -31,7 +32,7 @@ export default function NameSection() {
         preferredName: profile.preferredName,
         gender: profile.gender,
         ssn: profile.ssn,
-        dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.slice(0, 10) : undefined,  
+        dateOfBirth: profile.dateOfBirth ? dayjs(profile.dateOfBirth) : undefined,  
       });
     }
   }, [profile, form]);
@@ -44,7 +45,7 @@ export default function NameSection() {
       preferredName: values.preferredName,
       gender: values.gender,
       ssn: values.ssn,
-      dateOfBirth: values.dateOfBirth ? new Date(values.dateOfBirth).toISOString() : undefined,
+      dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : undefined,
     };
     const res = await dispatch(updateMyProfileThunk(updateData));
     if (res.error) {
@@ -105,7 +106,7 @@ export default function NameSection() {
               rules={[{ required: true, message: 'Date of birth is required' }]}
               tooltip="Must be in the past"
             >
-              <input type="date" className="ant-input" />
+              <DatePicker style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>

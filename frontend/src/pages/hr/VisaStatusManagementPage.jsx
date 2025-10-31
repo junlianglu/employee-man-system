@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Typography, Space, Row, Col, message } from 'antd';
+import { Typography, Space, Row, Col, message, Tabs } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles/VisaStatusManagementPage.module.css';
 import {
   fetchVisaStatusEmployees,
+  fetchOptInProgressEmployees,
   fetchPendingVisaDocuments,
   sendNextStepReminderThunk,
 } from '../../features/employee/employeeThunks.js';
@@ -12,6 +13,9 @@ import {
   selectVisaStatusEmployees,
   selectVisaStatusStatus,
   selectVisaStatusPagination,
+  selectOptInProgressEmployees,
+  selectOptInProgressStatus,
+  selectOptInProgressPagination,
   selectPendingVisaDocuments,
   selectPendingVisaDocumentsStatus,
 } from '../../features/employee/employeeSelectors.js';
@@ -22,9 +26,9 @@ import {
 } from '../../features/document/documentThunks.js';
 import { reviewDocumentThunk } from '../../features/document/documentThunks.js';
 
-import VisaStatusList from '../../components/hr/VisaManagement/VisaStatusList.jsx';
+import InProgressList from '../../components/hr/VisaManagement/InProgressList.jsx';
+import AllEmployeesList from '../../components/hr/VisaManagement/AllEmployeesList.jsx';
 import DocumentApproval from '../../components/hr/VisaManagement/DocumentApproval.jsx';
-import NotificationSender from '../../components/hr/VisaManagement/NotificationSender.jsx';
 import DocumentPreview from '../../components/common/Documents/DocumentPreview.jsx';
 
 const { Title, Paragraph } = Typography;
@@ -32,10 +36,21 @@ const { Title, Paragraph } = Typography;
 export default function VisaStatusManagementPage() {
   const dispatch = useDispatch();
 
-  const [query, setQuery] = useState({ page: 1, limit: 10, search: undefined, status: undefined });
-  const visaEmployees = useSelector(selectVisaStatusEmployees);
-  const visaStatus = useSelector(selectVisaStatusStatus);
-  const visaPage = useSelector(selectVisaStatusPagination);
+  const [activeTab, setActiveTab] = useState('in-progress');
+  
+  // In Progress tab state
+  const [inProgressQuery, setInProgressQuery] = useState({ page: 1, limit: 10, search: undefined });
+  const inProgressEmployees = useSelector(selectOptInProgressEmployees);
+  const inProgressStatus = useSelector(selectOptInProgressStatus);
+  const inProgressPage = useSelector(selectOptInProgressPagination);
+  const [inProgressSearch, setInProgressSearch] = useState('');
+
+  // All tab state
+  const [allQuery, setAllQuery] = useState({ page: 1, limit: 10, search: undefined });
+  const allEmployees = useSelector(selectVisaStatusEmployees);
+  const allStatus = useSelector(selectVisaStatusStatus);
+  const allPage = useSelector(selectVisaStatusPagination);
+  const [allSearch, setAllSearch] = useState('');
 
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const selectedDocs = useSelector((s) =>
@@ -48,34 +63,46 @@ export default function VisaStatusManagementPage() {
   const [previewDoc, setPreviewDoc] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const [notifySearch, setNotifySearch] = useState({ text: '', items: [] });
-  const notifyOptions = useMemo(() => notifySearch.items, [notifySearch.items]);
-
+  // Fetch data based on active tab
   useEffect(() => {
-    dispatch(fetchVisaStatusEmployees({ page: query.page, limit: query.limit, search: query.search }));
-  }, [dispatch, query.page, query.limit, query.search]);
+    if (activeTab === 'in-progress') {
+      dispatch(fetchOptInProgressEmployees({ page: inProgressQuery.page, limit: inProgressQuery.limit, search: inProgressQuery.search }));
+    } else {
+      dispatch(fetchVisaStatusEmployees({ page: allQuery.page, limit: allQuery.limit, search: allQuery.search }));
+    }
+  }, [dispatch, activeTab, inProgressQuery.page, inProgressQuery.limit, inProgressQuery.search, allQuery.page, allQuery.limit, allQuery.search]);
 
-  // const filteredVisaEmployees = useMemo(() => {
-  //   if (!query.status) return visaEmployees;
-  //   return (visaEmployees || []).filter((e) => e.citizenshipStatus === query.status);
-  // }, [visaEmployees, query.status]);
-
-  const handleVisaSearch = (vals) => {
-    setQuery((q) => ({
-      ...q,
-      page: 1,
-      search: vals.search,
-      //status: vals.status,
-    }));
+  const handleInProgressPageChange = (page) => {
+    setInProgressQuery((q) => ({ ...q, page }));
   };
 
-  const handleVisaPageChange = (page) => {
-    setQuery((q) => ({ ...q, page }));
+  const handleAllPageChange = (page) => {
+    setAllQuery((q) => ({ ...q, page }));
   };
 
-  const handleViewDocuments = (employeeId) => {
+  const handleViewDocument = (employeeId, docId) => {
     setSelectedEmployeeId(employeeId);
     dispatch(fetchPendingVisaDocuments(employeeId));
+    const doc = (selectedDocs || []).find((d) => d._id === docId);
+    if (doc) {
+      setPreviewDoc(doc);
+      setPreviewOpen(true);
+      dispatch(viewDocumentUrl({ docId, hr: true }));
+    }
+  };
+
+  const handleViewPendingDocument = async (employeeId, docId) => {
+    setSelectedEmployeeId(employeeId);
+    const res = await dispatch(fetchPendingVisaDocuments(employeeId));
+    if (!res.error && res.payload) {
+      const { documents } = res.payload;
+      const doc = documents?.find((d) => d._id === docId);
+      if (doc) {
+        setPreviewDoc(doc);
+        setPreviewOpen(true);
+        dispatch(viewDocumentUrl({ docId, hr: true }));
+      }
+    }
   };
 
   const handleView = (docId) => {
@@ -84,6 +111,33 @@ export default function VisaStatusManagementPage() {
     setPreviewDoc(doc);
     setPreviewOpen(true);
     dispatch(viewDocumentUrl({ docId, hr: true }));
+  };
+
+  const handleViewAllDocument = (employeeId, docId) => {
+    // For approved documents in All tab, we can view directly
+    const employee = allEmployees.find(e => e._id === employeeId);
+    const doc = employee?.documents?.find(d => d._id === docId && d.status === 'approved');
+    if (doc) {
+      setPreviewDoc(doc);
+      setPreviewOpen(true);
+      dispatch(viewDocumentUrl({ docId, hr: true }));
+    }
+  };
+
+  const handleDownloadAllDocument = async (employeeId, docId) => {
+    const res = await dispatch(downloadDocumentThunk({ docId, hr: true }));
+    const payload = res?.payload;
+    if (!payload?.blob) {
+      message.error('Failed to download');
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(payload.blob);
+    link.download = payload.filename || 'document';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 0);
   };
 
   const handleDownload = async (docId) => {
@@ -120,19 +174,69 @@ export default function VisaStatusManagementPage() {
     }
   };
 
-  const handleSearchEmployees = async (text) => {
-    setNotifySearch((s) => ({ ...s, text }));
-    const res = await dispatch(fetchVisaStatusEmployees({ page: 1, limit: 10, search: text || undefined }));
-    if (!res.error) {
-      setNotifySearch({ text, items: res.payload?.employees || [] });
+  const handleSendNotification = async (employeeId) => {
+    const res = await dispatch(sendNextStepReminderThunk(employeeId));
+    if (res.error) message.error(res.error.message || 'Failed to send');
+    else {
+      message.success('Reminder sent');
+      // Refresh in-progress list
+      dispatch(fetchOptInProgressEmployees({ page: inProgressQuery.page, limit: inProgressQuery.limit, search: inProgressQuery.search }));
     }
   };
 
-  const handleSendReminder = async ({ employeeId }) => {
-    const res = await dispatch(sendNextStepReminderThunk(employeeId));
-    if (res.error) message.error(res.error.message || 'Failed to send');
-    else message.success('Reminder sent');
-  };
+  const tabItems = [
+    {
+      key: 'in-progress',
+      label: 'In Progress',
+      children: (
+        <Row gutter={[16, 16]} className={styles.contentRow}>
+          <Col xs={24} lg={activeTab === 'in-progress' && selectedDocs.length > 0 ? 14 : 24} className={styles.listColumn}>
+            <InProgressList
+              items={inProgressEmployees}
+              loading={inProgressStatus === 'loading'}
+              pagination={inProgressPage}
+              onChangePage={handleInProgressPageChange}
+              onViewDocument={handleViewPendingDocument}
+              onApproveReject={() => {}}
+              onSendNotification={handleSendNotification}
+              searchValue={inProgressSearch}
+              onSearchChange={setInProgressSearch}
+            />
+          </Col>
+          {selectedDocs.length > 0 && (
+            <Col xs={24} lg={10} className={styles.actionColumn}>
+              <div className={styles.cardWrapper}>
+                <DocumentApproval
+                  documents={selectedDocs}
+                  loading={selectedDocsStatus === 'loading'}
+                  onView={handleView}
+                  onDownload={handleDownload}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
+              </div>
+            </Col>
+          )}
+        </Row>
+      ),
+    },
+    {
+      key: 'all',
+      label: 'All',
+      children: (
+        <AllEmployeesList
+          items={allEmployees}
+          loading={allStatus === 'loading'}
+          pagination={allPage}
+          onChangePage={handleAllPageChange}
+          onViewDocument={handleViewAllDocument}
+          onDownloadDocument={handleDownloadAllDocument}
+          searchValue={allSearch}
+          onSearchChange={setAllSearch}
+        />
+      ),
+    },
+  ];
 
   return (
     <Space direction="vertical" size="large" className={styles.container}>
@@ -143,44 +247,18 @@ export default function VisaStatusManagementPage() {
         </Paragraph>
       </Typography>
 
-      <Row gutter={[16, 16]} className={styles.contentRow}>
-        <Col xs={24} lg={14} className={styles.listColumn}>
-          <VisaStatusList
-            items={visaEmployees}
-            loading={visaStatus === 'loading'}
-            pagination={visaPage} 
-            onChangePage={handleVisaPageChange}
-            onSearch={handleVisaSearch}
-            onViewDocuments={handleViewDocuments}
-            defaultFilter={{ search: query.search}}
-          />
-        </Col>
-        <Col xs={24} lg={10} className={styles.actionColumn}>
-        <div className={styles.cardWrapper}>
-            <DocumentApproval
-              documents={selectedDocs}
-              loading={selectedDocsStatus === 'loading'}
-              onView={handleView}
-              onDownload={handleDownload}
-              onApprove={handleApprove}
-              onReject={handleReject}
-            />
-          </div>
-          <div className={styles.actionSpacer} />
-          <div className={styles.cardWrapper}>
-            <NotificationSender
-              employees={notifyOptions}
-              loading={false}
-              onSearchEmployees={handleSearchEmployees}
-              onSend={handleSendReminder}
-            />
-          </div>
-        </Col>
-      </Row>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+      />
 
       <DocumentPreview
         open={previewOpen}
-        onClose={() => setPreviewOpen(false)}
+        onClose={() => {
+          setPreviewOpen(false);
+          setPreviewDoc(null);
+        }}
         doc={previewDoc}
         isHR
       />

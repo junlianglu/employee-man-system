@@ -39,11 +39,10 @@ export default function VisaStatusManagementPage() {
   const [activeTab, setActiveTab] = useState('in-progress');
   
   // In Progress tab state
-  const [inProgressQuery, setInProgressQuery] = useState({ page: 1, limit: 10, search: undefined });
+  const [inProgressQuery, setInProgressQuery] = useState({ page: 1, limit: 10 });
   const inProgressEmployees = useSelector(selectOptInProgressEmployees);
   const inProgressStatus = useSelector(selectOptInProgressStatus);
   const inProgressPage = useSelector(selectOptInProgressPagination);
-  const [inProgressSearch, setInProgressSearch] = useState('');
 
   // All tab state
   const [allQuery, setAllQuery] = useState({ page: 1, limit: 10, search: undefined });
@@ -66,11 +65,11 @@ export default function VisaStatusManagementPage() {
   // Fetch data based on active tab
   useEffect(() => {
     if (activeTab === 'in-progress') {
-      dispatch(fetchOptInProgressEmployees({ page: inProgressQuery.page, limit: inProgressQuery.limit, search: inProgressQuery.search }));
+      dispatch(fetchOptInProgressEmployees({ page: inProgressQuery.page, limit: inProgressQuery.limit }));
     } else {
       dispatch(fetchVisaStatusEmployees({ page: allQuery.page, limit: allQuery.limit, search: allQuery.search }));
     }
-  }, [dispatch, activeTab, inProgressQuery.page, inProgressQuery.limit, inProgressQuery.search, allQuery.page, allQuery.limit, allQuery.search]);
+  }, [dispatch, activeTab, inProgressQuery.page, inProgressQuery.limit, allQuery.page, allQuery.limit, allQuery.search]);
 
   const handleInProgressPageChange = (page) => {
     setInProgressQuery((q) => ({ ...q, page }));
@@ -197,10 +196,7 @@ export default function VisaStatusManagementPage() {
               pagination={inProgressPage}
               onChangePage={handleInProgressPageChange}
               onViewDocument={handleViewPendingDocument}
-              onApproveReject={() => {}}
               onSendNotification={handleSendNotification}
-              searchValue={inProgressSearch}
-              onSearchChange={setInProgressSearch}
             />
           </Col>
           {selectedDocs.length > 0 && (

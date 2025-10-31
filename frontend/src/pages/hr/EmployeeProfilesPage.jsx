@@ -27,14 +27,14 @@ export default function EmployeeProfilesPage() {
     page: 1,
     limit: 12,
     search: undefined,
-    status: undefined,
-    visa: undefined, 
+    //status: undefined,
+    //visa: undefined, 
   });
 
   useEffect(() => {
-    const { page, limit, search, status } = query;
-    dispatch(fetchEmployees({ page, limit, search, status }));
-  }, [dispatch, query.page, query.limit, query.search, query.status]);
+    const { page, limit, search } = query;
+    dispatch(fetchEmployees({ page, limit, search }));
+  }, [dispatch, query.page, query.limit, query.search]);
 
   const filteredItems = useMemo(() => {
     if (!query.visa) return employees;
@@ -48,8 +48,8 @@ export default function EmployeeProfilesPage() {
       ...q,
       page: 1,
       search: values.search,
-      status: values.status,
-      visa: values.visa,
+      //status: values.status,
+      //visa: values.visa,
     }));
   };
 
@@ -71,7 +71,7 @@ export default function EmployeeProfilesPage() {
 
       <Card bordered={false}>
         <EmployeeSearch
-          initial={{ search: query.search, status: query.status, visa: query.visa }}
+          initial={{ search: query.search }}
           onSearch={handleSearch}
         />
         <EmployeeSummary

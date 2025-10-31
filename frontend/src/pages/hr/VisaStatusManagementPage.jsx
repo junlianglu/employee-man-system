@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Typography, Space, Row, Col, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-
+import styles from './styles/VisaStatusManagementPage.module.css';
 import {
   fetchVisaStatusEmployees,
   fetchPendingVisaDocuments,
@@ -55,17 +55,17 @@ export default function VisaStatusManagementPage() {
     dispatch(fetchVisaStatusEmployees({ page: query.page, limit: query.limit, search: query.search }));
   }, [dispatch, query.page, query.limit, query.search]);
 
-  const filteredVisaEmployees = useMemo(() => {
-    if (!query.status) return visaEmployees;
-    return (visaEmployees || []).filter((e) => e.citizenshipStatus === query.status);
-  }, [visaEmployees, query.status]);
+  // const filteredVisaEmployees = useMemo(() => {
+  //   if (!query.status) return visaEmployees;
+  //   return (visaEmployees || []).filter((e) => e.citizenshipStatus === query.status);
+  // }, [visaEmployees, query.status]);
 
   const handleVisaSearch = (vals) => {
     setQuery((q) => ({
       ...q,
       page: 1,
       search: vals.search,
-      status: vals.status,
+      //status: vals.status,
     }));
   };
 
@@ -135,42 +135,46 @@ export default function VisaStatusManagementPage() {
   };
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Typography>
-        <Title level={3} style={{ margin: 0 }}>Visa Status Management</Title>
-        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+    <Space direction="vertical" size="large" className={styles.container}>
+      <Typography className={styles.header}>
+        <Title level={3} className={styles.title}>Visa Status Management</Title>
+        <Paragraph type="secondary" className={styles.description}>
           Track work visa employees, review pending documents, and send reminders.
         </Paragraph>
       </Typography>
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={14}>
+      <Row gutter={[16, 16]} className={styles.contentRow}>
+        <Col xs={24} lg={14} className={styles.listColumn}>
           <VisaStatusList
-            items={filteredVisaEmployees}
+            items={visaEmployees}
             loading={visaStatus === 'loading'}
-            pagination={query.status ? null : visaPage}
+            pagination={visaPage} 
             onChangePage={handleVisaPageChange}
             onSearch={handleVisaSearch}
             onViewDocuments={handleViewDocuments}
-            defaultFilter={{ search: query.search, status: query.status }}
+            defaultFilter={{ search: query.search}}
           />
         </Col>
-        <Col xs={24} lg={10}>
-          <DocumentApproval
-            documents={selectedDocs}
-            loading={selectedDocsStatus === 'loading'}
-            onView={handleView}
-            onDownload={handleDownload}
-            onApprove={handleApprove}
-            onReject={handleReject}
-          />
-          <div style={{ height: 16 }} />
-          <NotificationSender
-            employees={notifyOptions}
-            loading={false}
-            onSearchEmployees={handleSearchEmployees}
-            onSend={handleSendReminder}
-          />
+        <Col xs={24} lg={10} className={styles.actionColumn}>
+        <div className={styles.cardWrapper}>
+            <DocumentApproval
+              documents={selectedDocs}
+              loading={selectedDocsStatus === 'loading'}
+              onView={handleView}
+              onDownload={handleDownload}
+              onApprove={handleApprove}
+              onReject={handleReject}
+            />
+          </div>
+          <div className={styles.actionSpacer} />
+          <div className={styles.cardWrapper}>
+            <NotificationSender
+              employees={notifyOptions}
+              loading={false}
+              onSearchEmployees={handleSearchEmployees}
+              onSend={handleSendReminder}
+            />
+          </div>
         </Col>
       </Row>
 

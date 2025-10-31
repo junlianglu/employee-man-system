@@ -238,22 +238,62 @@ export const getAllVisaStatusEmployees = async ({ page = 1, limit = 10, search }
 };
 
 export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, search } = {}) => {
-  const query = {
-    citizenshipStatus: 'work_visa',
-    workAuthorizationType: 'F1(CPT/OPT)'
+  const { RegistrationToken } = await import('../models/RegistrationToken.js');
+  const now = new Date();
+
+  // Step 1: Get registration tokens that haven't been used (no employee exists, token not expired, not submitted)
+  const unusedTokens = await RegistrationToken.find({
+    submittedAt: { $exists: false },
+    expiresAt: { $gt: now }
+  })
+    .select('email firstName middleName lastName createdAt')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // Check which tokens don't have corresponding employees
+  const tokensWithNoEmployee = [];
+  for (const token of unusedTokens) {
+    const employeeExists = await Employee.findOne({ email: token.email });
+    if (!employeeExists) {
+      tokensWithNoEmployee.push({
+        ...token,
+        _id: token._id || `token-${token.email}`,
+        isToken: true, // Flag to identify this is a token, not an employee
+        onboardingReview: { status: 'never_submitted' }
+      });
+    }
+  }
+
+  // Step 2: Get employees who haven't completed the full process
+  // This includes: never_submitted, pending, rejected onboarding OR approved onboarding but incomplete OPT docs
+  let employeeQuery = {
+    $or: [
+      // Employees who haven't submitted onboarding
+      { 'onboardingReview.status': 'never_submitted' },
+      { 'onboardingReview.status': 'pending' },
+      { 'onboardingReview.status': 'rejected' },
+      // OR employees with approved onboarding but potentially incomplete OPT docs
+      {
+        'onboardingReview.status': 'approved',
+        citizenshipStatus: 'work_visa',
+        workAuthorizationType: 'F1(CPT/OPT)'
+      }
+    ]
   };
 
   if (search) {
-    query.$or = [
-      { firstName: { $regex: search, $options: 'i' } },
-      { lastName: { $regex: search, $options: 'i' } },
-      { preferredName: { $regex: search, $options: 'i' } }
-    ];
+    const searchQuery = {
+      $or: [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { preferredName: { $regex: search, $options: 'i' } }
+      ]
+    };
+    employeeQuery = { $and: [employeeQuery, searchQuery] };
   }
 
-
-  const candidates = await Employee.find(query)
-    .select('firstName preferredName lastName email workAuthorizationType visaStartDate visaEndDate documents')
+  const employees = await Employee.find(employeeQuery)
+    .select('firstName middleName lastName preferredName email workAuthorizationType visaStartDate visaEndDate citizenshipStatus documents onboardingReview')
     .populate({
       path: 'documents',
       select: 'type status fileName fileUrl hrFeedback'
@@ -261,69 +301,139 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
     .sort({ createdAt: -1 })
     .lean();
 
-  const byType = (docs, type) => docs.find(d => d.type === type);
+  const byType = (docs, type) => (docs || []).find(d => d.type === type);
   const state = (doc) => (doc ? doc.status : 'not_uploaded');
   const feedback = (doc) => (doc?.hrFeedback ? ` HR feedback: ${doc.hrFeedback}` : '');
 
-  const computeNextStep = (docs) => {
-    const r = byType(docs, 'opt_receipt');
-    if (state(r) === 'not_uploaded') return { nextStep: 'Please upload your OPT Receipt.' };
-    if (state(r) === 'pending') return { nextStep: 'Waiting for HR to approve your OPT Receipt.', pendingDoc: r };
-    if (state(r) === 'rejected') return { nextStep: `Your OPT Receipt was rejected.${feedback(r)} Please re-upload your OPT Receipt.` };
-
-    const ead = byType(docs, 'opt_ead');
-    if (state(ead) === 'not_uploaded') return { nextStep: 'Please upload a copy of your OPT EAD.' };
-    if (state(ead) === 'pending') return { nextStep: 'Waiting for HR to approve your OPT EAD.', pendingDoc: ead };
-    if (state(ead) === 'rejected') return { nextStep: `Your OPT EAD was rejected.${feedback(ead)} Please re-upload your OPT EAD.` };
-
-    const i983 = byType(docs, 'i983');
-    if (state(i983) === 'not_uploaded') {
-      return {
-        nextStep: 'Please download the I-983 Empty Template and Sample Template, fill it out, and upload it.'
-      };
+  // Compute next step based on employee state
+  const computeNextStep = (employee) => {
+    // If this is a token (not an employee yet)
+    if (employee.isToken) {
+      return { nextStep: 'Next step: Submit registration using the registration token link sent via email.' };
     }
-    if (state(i983) === 'pending') return { nextStep: 'Waiting for HR to approve and sign your I-983.', pendingDoc: i983 };
-    if (state(i983) === 'rejected') return { nextStep: `Your I-983 was rejected.${feedback(i983)} Please fix and re-upload your I-983.` };
 
-    const i20 = byType(docs, 'i20');
-    if (state(i20) === 'not_uploaded') return { nextStep: 'Please upload your new I-20.' };
-    if (state(i20) === 'pending') return { nextStep: 'Waiting for HR to approve your I-20.', pendingDoc: i20 };
-    if (state(i20) === 'rejected') return { nextStep: `Your I-20 was rejected.${feedback(i20)} Please fix and re-upload your I-20.` };
+    // Check onboarding status first
+    const onboardingStatus = employee.onboardingReview?.status || 'never_submitted';
+    
+    if (onboardingStatus === 'never_submitted') {
+      return { nextStep: 'Next step: Submit onboarding application.' };
+    }
+    
+    if (onboardingStatus === 'pending') {
+      return { nextStep: 'Next step: Wait for HR to review your onboarding application.' };
+    }
+    
+    if (onboardingStatus === 'rejected') {
+      const feedbackText = employee.onboardingReview?.hrFeedback 
+        ? ` HR feedback: ${employee.onboardingReview.hrFeedback}`
+        : '';
+      return { nextStep: `Next step: Review feedback and resubmit onboarding application.${feedbackText}` };
+    }
 
+    // If onboarding is approved, check OPT documents
+    if (onboardingStatus === 'approved' && 
+        employee.citizenshipStatus === 'work_visa' && 
+        employee.workAuthorizationType === 'F1(CPT/OPT)') {
+      const docs = employee.documents || [];
+      
+      const r = byType(docs, 'opt_receipt');
+      if (state(r) === 'not_uploaded') return { nextStep: 'Next step: Please upload your OPT Receipt.' };
+      if (state(r) === 'pending') return { nextStep: 'Next step: Waiting for HR to approve your OPT Receipt.', pendingDoc: r };
+      if (state(r) === 'rejected') return { nextStep: `Next step: Your OPT Receipt was rejected.${feedback(r)} Please re-upload your OPT Receipt.` };
 
-    if (state(i20) === 'approved') return { nextStep: 'All documents have been approved.' };
+      const ead = byType(docs, 'opt_ead');
+      if (state(ead) === 'not_uploaded') return { nextStep: 'Next step: Please upload a copy of your OPT EAD.' };
+      if (state(ead) === 'pending') return { nextStep: 'Next step: Waiting for HR to approve your OPT EAD.', pendingDoc: ead };
+      if (state(ead) === 'rejected') return { nextStep: `Next step: Your OPT EAD was rejected.${feedback(ead)} Please re-upload your OPT EAD.` };
 
-    return { nextStep: 'Please review your visa status and documents for next steps.' };
+      const i983 = byType(docs, 'i983');
+      if (state(i983) === 'not_uploaded') {
+        return { nextStep: 'Next step: Please download the I-983 Empty Template and Sample Template, fill it out, and upload it.' };
+      }
+      if (state(i983) === 'pending') return { nextStep: 'Next step: Waiting for HR to approve and sign your I-983.', pendingDoc: i983 };
+      if (state(i983) === 'rejected') return { nextStep: `Next step: Your I-983 was rejected.${feedback(i983)} Please fix and re-upload your I-983.` };
+
+      const i20 = byType(docs, 'i20');
+      if (state(i20) === 'not_uploaded') return { nextStep: 'Next step: Please upload your new I-20.' };
+      if (state(i20) === 'pending') return { nextStep: 'Next step: Waiting for HR to approve your I-20.', pendingDoc: i20 };
+      if (state(i20) === 'rejected') return { nextStep: `Next step: Your I-20 was rejected.${feedback(i20)} Please fix and re-upload your I-20.` };
+
+      if (state(i20) === 'approved') return { nextStep: 'All documents have been approved.' };
+    }
+
+    return { nextStep: 'Please review your status for next steps.' };
   };
 
+  // Combine tokens and employees
+  const allItems = [
+    ...tokensWithNoEmployee.map(token => ({
+      ...token,
+      firstName: token.firstName,
+      middleName: token.middleName || '',
+      lastName: token.lastName,
+      preferredName: '',
+      email: token.email,
+      workAuthorizationType: null,
+      visaStartDate: null,
+      visaEndDate: null,
+      documents: [],
+      onboardingReview: { status: 'never_submitted' }
+    })),
+    ...employees
+  ];
 
-  const inProgressAll = candidates
-    .map(e => {
-      const { nextStep, pendingDoc } = computeNextStep(e.documents || []);
-      const allApproved =
-        state(byType(e.documents || [], 'opt_receipt')) === 'approved' &&
-        state(byType(e.documents || [], 'opt_ead')) === 'approved' &&
-        state(byType(e.documents || [], 'i983')) === 'approved' &&
-        state(byType(e.documents || [], 'i20')) === 'approved';
+  // Filter by search if provided
+  let filteredItems = allItems;
+  if (search) {
+    const searchLower = search.toLowerCase().trim();
+    filteredItems = allItems.filter(item => {
+      const firstName = (item.firstName || '').toLowerCase();
+      const lastName = (item.lastName || '').toLowerCase();
+      const preferredName = (item.preferredName || '').toLowerCase();
+      const email = (item.email || '').toLowerCase();
+      return firstName.includes(searchLower) || 
+             lastName.includes(searchLower) || 
+             preferredName.includes(searchLower) ||
+             email.includes(searchLower);
+    });
+  }
+
+  // Process each item to determine if they're truly in progress
+  const inProgressAll = filteredItems
+    .map(item => {
+      const { nextStep, pendingDoc } = computeNextStep(item);
+      
+      // Determine if all approved (only applies to OPT employees with approved onboarding)
+      let allApproved = false;
+      if (item.onboardingReview?.status === 'approved' &&
+          item.citizenshipStatus === 'work_visa' &&
+          item.workAuthorizationType === 'F1(CPT/OPT)') {
+        const docs = item.documents || [];
+        allApproved =
+          state(byType(docs, 'opt_receipt')) === 'approved' &&
+          state(byType(docs, 'opt_ead')) === 'approved' &&
+          state(byType(docs, 'i983')) === 'approved' &&
+          state(byType(docs, 'i20')) === 'approved';
+      }
 
       return {
-        ...e,
+        ...item,
         nextStep,
         pendingDoc: pendingDoc || null,
         allApproved
       };
     })
-    .filter(e => !e.allApproved);
+    .filter(item => !item.allApproved); // Filter out those who completed everything
 
-
+  // Apply pagination
   const total = inProgressAll.length;
   const start = (page - 1) * limit;
   const list = inProgressAll.slice(start, start + limit);
 
-  const now = new Date();
-  const withDays = list.map(e => ({
-    ...e,
-    daysRemaining: e.visaEndDate ? Math.ceil((new Date(e.visaEndDate) - now) / 86400000) : null
+  // Add days remaining for employees with visa dates
+  const withDays = list.map(item => ({
+    ...item,
+    daysRemaining: item.visaEndDate ? Math.ceil((new Date(item.visaEndDate) - now) / 86400000) : null
   }));
 
   return {

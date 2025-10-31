@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Card, Table, Button, Space, Tag, Typography, Input, Popover, Empty } from 'antd';
 import { EyeOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import './AllEmployeesList.css';
 
 const { Text } = Typography;
 
@@ -49,19 +50,29 @@ export default function AllEmployeesList({
         return fullName || r.preferredName || r.username;
       },
       ellipsis: true,
+      width: 150,
+      fixed: 'left',
     },
-    { title: 'Email', dataIndex: 'email', key: 'email', ellipsis: true },
+    { 
+      title: 'Email', 
+      dataIndex: 'email', 
+      key: 'email', 
+      ellipsis: true,
+      width: 180,
+    },
     {
       title: 'Citizenship',
       dataIndex: 'citizenshipStatus',
       key: 'citizenshipStatus',
       render: (v) => citizenshipTag(v),
+      width: 120,
     },
     {
       title: 'Work Auth',
       dataIndex: 'workAuthorizationType',
       key: 'workAuthorizationType',
       render: (v) => v || '—',
+      width: 120,
     },
     {
       title: 'Visa Validity',
@@ -70,6 +81,7 @@ export default function AllEmployeesList({
         r.visaStartDate || r.visaEndDate
           ? `${r.visaStartDate ? dayjs(r.visaStartDate).format('YYYY-MM-DD') : '—'} → ${r.visaEndDate ? dayjs(r.visaEndDate).format('YYYY-MM-DD') : '—'}`
           : '—',
+      width: 180,
     },
     {
       title: 'Days Left',
@@ -84,6 +96,7 @@ export default function AllEmployeesList({
         );
       },
       sorter: (a, b) => (daysLeft(a.visaEndDate) ?? Number.MAX_SAFE_INTEGER) - (daysLeft(b.visaEndDate) ?? Number.MAX_SAFE_INTEGER),
+      width: 100,
     },
     {
       title: 'Approved Documents',
@@ -121,6 +134,7 @@ export default function AllEmployeesList({
           </Popover>
         );
       },
+      width: 150,
     },
   ], [onViewDocument, onDownloadDocument]);
 
@@ -136,7 +150,7 @@ export default function AllEmployeesList({
     <Card
       title="All Visa Status Employees"
       extra={
-        <Space>
+        <Space className="all-employees-search-wrapper">
           {searchResultsInfo}
           <Input
             placeholder="Search by first name, last name, preferred name..."
@@ -144,10 +158,12 @@ export default function AllEmployeesList({
             value={searchValue}
             onChange={(e) => onSearchChange?.(e.target.value)}
             allowClear
-            style={{ width: 300 }}
+            className="all-employees-search"
+            style={{ width: 300, maxWidth: '100%' }}
           />
         </Space>
       }
+      className="all-employees-list-card"
     >
       {filteredItems.length === 0 && !loading && (
         <Empty
@@ -156,19 +172,23 @@ export default function AllEmployeesList({
           }
         />
       )}
-      <Table
-        rowKey={(r) => r._id}
-        columns={columns}
-        dataSource={filteredItems}
-        loading={loading}
-        pagination={pagination ? {
-          current: pagination.page || 1,
-          pageSize: pagination.limit || 10,
-          total: pagination.total || 0,
-          showSizeChanger: false,
-          onChange: onChangePage,
-        } : false}
-      />
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          rowKey={(r) => r._id}
+          columns={columns}
+          dataSource={filteredItems}
+          loading={loading}
+          pagination={pagination ? {
+            current: pagination.page || 1,
+            pageSize: pagination.limit || 10,
+            total: pagination.total || 0,
+            showSizeChanger: false,
+            onChange: onChangePage,
+          } : false}
+          scroll={{ x: 'max-content' }}
+          size="middle"
+        />
+      </div>
     </Card>
   );
 }

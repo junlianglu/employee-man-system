@@ -17,6 +17,7 @@ import HRDashboardPage from './pages/hr/HRDashboardPage.jsx';
 import HiringManagementPage from './pages/hr/HiringManagementPage.jsx';
 import EmployeeProfilesPage from './pages/hr/EmployeeProfilesPage.jsx';
 import VisaStatusManagementPage from './pages/hr/VisaStatusManagementPage.jsx';
+import OnboardingReviewPage from './pages/hr/OnboardingReviewPage.jsx';
 
 import UnauthorizedPage from './pages/shared/UnauthorizedPage.jsx';
 import NotFoundPage from './pages/shared/NotFoundPage.jsx';
@@ -46,6 +47,7 @@ function App() {
             <Route element={<ProtectedRoute requireHR={true} />}>
               <Route path="/hr" element={<HRDashboardPage />} />
               <Route path="/hr/hiring" element={<HiringManagementPage />} />
+              <Route path="/hr/hiring/review/:employeeId" element={<OnboardingReviewPage />} />
               <Route path="/hr/employees" element={<EmployeeProfilesPage />} />
               <Route path="/hr/visa" element={<VisaStatusManagementPage />} />
             </Route>

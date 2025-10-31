@@ -1,7 +1,10 @@
 import { Form, Input, Button, Space, Row, Col } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
-export default function EmergencyContactForm({ name = 'emergencyContacts', min = 1, max = 3 }) {
+export default function EmergencyContactForm({ name = 'emergencyContacts', min = 1, max = 3, readOnly: propReadOnly }) {
+  const form = Form.useFormInstance();
+  const isReadOnly = propReadOnly !== undefined ? propReadOnly : (form?.disabled || false);
+
   return (
     <Form.List 
       name={name}
@@ -37,6 +40,15 @@ export default function EmergencyContactForm({ name = 'emergencyContacts', min =
                 <Col xs={24} md={8}>
                   <Form.Item
                     {...restField}
+                    name={[itemName, 'middleName']}
+                    label="Middle Name"
+                  >
+                    <Input placeholder="Optional" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={8}>
+                  <Form.Item
+                    {...restField}
                     name={[itemName, 'lastName']}
                     label="Last Name"
                     rules={[{ required: true, message: 'Required' }]}
@@ -44,6 +56,8 @@ export default function EmergencyContactForm({ name = 'emergencyContacts', min =
                     <Input placeholder="Last name" />
                   </Form.Item>
                 </Col>
+              </Row>
+              <Row gutter={16}>
                 <Col xs={24} md={8}>
                   <Form.Item
                     {...restField}
@@ -54,54 +68,55 @@ export default function EmergencyContactForm({ name = 'emergencyContacts', min =
                     <Input placeholder="e.g., Spouse, Parent, Friend" />
                   </Form.Item>
                 </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                   <Form.Item
                     {...restField}
                     name={[itemName, 'phone']}
                     label="Phone"
                     rules={[
-                      { required: true, message: 'Required' },
                       { pattern: /^\+?\d[\d\s\-()]{7,}$/, message: 'Invalid phone number' },
                     ]}
                   >
-                    <Input placeholder="+1 555 555 5555" />
+                    <Input placeholder="Optional" />
                   </Form.Item>
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                   <Form.Item
                     {...restField}
                     name={[itemName, 'email']}
                     label="Email"
                     rules={[{ type: 'email', message: 'Invalid email' }]}
                   >
-                    <Input placeholder="name@example.com" />
+                    <Input placeholder="Optional" />
                   </Form.Item>
                 </Col>
               </Row>
-              <div>
-                <Button
-                  danger
-                  type="text"
-                  icon={<MinusCircleOutlined />}
-                  onClick={() => remove(itemName)}
-                  disabled={fields.length <= min}
-                >
-                  Remove this contact
-                </Button>
-              </div>
+              {!isReadOnly && (
+                <div>
+                  <Button
+                    danger
+                    type="text"
+                    icon={<MinusCircleOutlined />}
+                    onClick={() => remove(itemName)}
+                    disabled={fields.length <= min}
+                  >
+                    Remove this contact
+                  </Button>
+                </div>
+              )}
             </Space>
           ))}
-          <Button
-            type="dashed"
-            onClick={() => add()}
-            block
-            icon={<PlusOutlined />}
-            disabled={fields.length >= max}
-          >
-            Add emergency contact
-          </Button>
+          {!isReadOnly && (
+            <Button
+              type="dashed"
+              onClick={() => add()}
+              block
+              icon={<PlusOutlined />}
+              disabled={fields.length >= max}
+            >
+              Add emergency contact
+            </Button>
+          )}
           <Form.ErrorList errors={errors} />
         </>
       )}

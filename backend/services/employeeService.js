@@ -61,6 +61,26 @@ export const reviewOnboardingApplication = async (employeeId, reviewData) => {
   
   await employee.save();
   
+  // If onboarding is approved, auto-approve non-OPT documents
+  if (status === 'approved') {
+    const Document = (await import('../models/Document.js')).Document;
+    const nonOptDocumentTypes = ['profile_picture', 'drivers_license', 'work_authorization'];
+    
+    await Document.updateMany(
+      {
+        employeeId: employeeId,
+        type: { $in: nonOptDocumentTypes },
+        status: 'pending'
+      },
+      {
+        $set: {
+          status: 'approved',
+          reviewedAt: new Date()
+        }
+      }
+    );
+  }
+  
   return employee;
 };
 
@@ -84,7 +104,7 @@ export const updateEmployee = async (employeeId, updateData) => {
     const has = (obj, path) => path.split('.').reduce((o, k) => (o && o[k] !== undefined && o[k] !== null ? o[k] : undefined), obj) !== undefined;
     const check = (cond, name) => { if (!cond) required.push(name); };
 
-    check(!!updateData.username, 'username');
+    // Note: username is set during registration, not during onboarding submission
     check(!!updateData.ssn, 'ssn');
     check(!!updateData.dateOfBirth, 'dateOfBirth');
     check(!!updateData.gender, 'gender');

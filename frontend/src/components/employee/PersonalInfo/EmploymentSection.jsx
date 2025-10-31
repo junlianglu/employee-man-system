@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Card, Form, Select, Input, Button, Space, Row, Col, message } from 'antd';
+import { Card, Form, Select, Input, Button, Space, Row, Col, message, DatePicker } from 'antd';
+import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProfile, updateMyProfileThunk } from '../../../features/employee/employeeThunks.js';
 import { selectMyProfile, selectMyProfileStatus, selectMyProfileUpdateStatus } from '../../../features/employee/employeeSelectors.js';
@@ -36,8 +37,8 @@ export default function EmploymentSection() {
         citizenshipStatus: profile.citizenshipStatus,
         workAuthorizationType: profile.workAuthorizationType,
         visaTitle: profile.visaTitle,
-        visaStartDate: profile.visaStartDate ? profile.visaStartDate.slice(0, 10) : undefined,
-        visaEndDate: profile.visaEndDate ? profile.visaEndDate.slice(0, 10) : undefined,
+        visaStartDate: profile.visaStartDate ? dayjs(profile.visaStartDate) : undefined,
+        visaEndDate: profile.visaEndDate ? dayjs(profile.visaEndDate) : undefined,
       });
     }
   }, [profile, form]);
@@ -62,10 +63,10 @@ export default function EmploymentSection() {
       workAuthorizationType: values.citizenshipStatus === 'work_visa' ? values.workAuthorizationType : undefined,
       visaTitle: values.workAuthorizationType === 'Other' ? values.visaTitle : undefined,
       visaStartDate: values.citizenshipStatus === 'work_visa' && values.visaStartDate
-        ? new Date(values.visaStartDate).toISOString()
+        ? values.visaStartDate.format('YYYY-MM-DD')
         : undefined,
       visaEndDate: values.citizenshipStatus === 'work_visa' && values.visaEndDate
-        ? new Date(values.visaEndDate).toISOString()
+        ? values.visaEndDate.format('YYYY-MM-DD')
         : undefined,
     };
     const res = await dispatch(updateMyProfileThunk(updateData));
@@ -126,7 +127,7 @@ export default function EmploymentSection() {
                 name="visaStartDate"
                 rules={[{ required: true, message: 'Start date is required' }]}
               >
-                <input type="date" className="ant-input" />
+                <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col xs={24} md={8}>
@@ -135,7 +136,7 @@ export default function EmploymentSection() {
                 name="visaEndDate"
                 rules={[{ required: true, message: 'End date is required' }]}
               >
-                <input type="date" className="ant-input" />
+                <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col>
           </Row>

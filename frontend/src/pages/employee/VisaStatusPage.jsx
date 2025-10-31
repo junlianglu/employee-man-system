@@ -1,4 +1,3 @@
-// frontend/src/pages/employee/VisaStatusPage.jsx
 import React, { useEffect, useMemo } from 'react';
 import { Typography, Space, Card, Divider, Button, Row, Col, Alert } from 'antd';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
@@ -14,21 +13,22 @@ import { uploadMyDocument } from '../../features/document/documentThunks.js';
 import DocumentUpload from '../../components/common/Documents/DocumentUpload.jsx';
 import DocumentList from '../../components/common/Documents/DocumentList.jsx';
 import StatusBadge from '../../components/common/Status/StatusBadge.jsx';
+import { message } from 'antd';
+import { downloadTemplate } from '../../api/documents.js';
 
 const { Title, Paragraph, Text } = Typography;
 
-// Helper to check if user is OPT
 const isOPTUser = (profile) =>
   profile?.citizenshipStatus === 'work_visa' && profile?.workAuthorizationType === 'F1(CPT/OPT)';
 
-// Get the next document type that can be uploaded (sequential enforcement)
+
 function getNextUploadableDoc(docsByType) {
   const byType = (type) => docsByType.find((d) => d.type === type);
   const state = (doc) => (doc ? doc.status : 'not_uploaded');
 
   const r = byType('opt_receipt');
   if (!r || state(r) === 'not_uploaded' || state(r) === 'rejected') return 'opt_receipt';
-  if (state(r) === 'pending') return null; // wait for approval
+  if (state(r) === 'pending') return null; 
 
   const ead = byType('opt_ead');
   if (!ead || state(ead) === 'not_uploaded' || state(ead) === 'rejected') return 'opt_ead';
@@ -42,7 +42,7 @@ function getNextUploadableDoc(docsByType) {
   if (!i20 || state(i20) === 'not_uploaded' || state(i20) === 'rejected') return 'i20';
   if (state(i20) === 'pending') return null;
 
-  return null; // all done
+  return null; 
 }
 
 export default function VisaStatusPage() {
@@ -72,7 +72,6 @@ export default function VisaStatusPage() {
   const byType = (type) => docsByType.find((d) => d.type === type);
   const state = (doc) => (doc ? doc.status : 'not_uploaded');
 
-  // Render individual document card with status messages
   const renderDocCard = (type, label, showTemplates = false) => {
     const doc = byType(type);
     const docState = state(doc);
@@ -155,23 +154,40 @@ export default function VisaStatusPage() {
             <Space>
               <Button
                 icon={<DownloadOutlined />}
-                onClick={() => {
-                  // Create blank PDFs or link to actual templates
-                  const link1 = document.createElement('a');
-                  link1.href = '#'; // Replace with actual template URL
-                  link1.download = 'I-983-Empty-Template.pdf';
-                  link1.click();
+                onClick={async () => {
+                  try {
+                    const { blob, filename } = await downloadTemplate('i983-empty');
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename || 'I-983-Empty-Template.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                  } catch (err) {
+                    message.error('Failed to download template');
+                  }
                 }}
               >
                 Empty Template
               </Button>
               <Button
                 icon={<DownloadOutlined />}
-                onClick={() => {
-                  const link2 = document.createElement('a');
-                  link2.href = '#'; // Replace with actual template URL
-                  link2.download = 'I-983-Sample-Template.pdf';
-                  link2.click();
+                onClick={async () => {
+                  try {
+                    const { blob, filename } = await downloadTemplate('i983-sample');
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename || 'I-983-Sample-Template.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                  } catch (err) {
+                    message.error('Failed to download template');
+                  }
                 }}
               >
                 Sample Template
@@ -179,6 +195,7 @@ export default function VisaStatusPage() {
             </Space>
           </Space>
         )}
+
 
         {message && (
           <Alert

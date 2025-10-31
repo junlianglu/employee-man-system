@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Card, Avatar, Tag, Typography, Space, Button } from 'antd';
 import { UserOutlined, IdcardOutlined, MailOutlined, FileTextOutlined } from '@ant-design/icons';
+import { fetchEmployeeDocuments } from '../../../features/document/documentThunks.js';
+import { selectEmployeeDocuments } from '../../../features/document/documentSelectors.js';
+import { BASE_URL } from '../../../api/base.js';
 
 function initialsOf(e) {
   const f = e?.firstName?.[0] || '';
@@ -33,6 +38,30 @@ export default function EmployeeCard({
   onViewProfile,
   onViewDocuments,
 }) {
+  const dispatch = useDispatch();
+  const employeeId = employee?._id;
+  const employeeDocs = useSelector((state) => (employeeId ? selectEmployeeDocuments(state, employeeId) : []));
+
+  // Fetch employee documents when employee ID is available
+  useEffect(() => {
+    if (employeeId && (!employeeDocs || employeeDocs.length === 0)) {
+      dispatch(fetchEmployeeDocuments(employeeId));
+    }
+  }, [dispatch, employeeId, employeeDocs]);
+
+  // Get profile picture document
+  const profilePictureDoc = employeeDocs?.find(d => d.type === 'profile_picture');
+
+  // Get the full URL for the profile picture
+  const getProfilePictureUrl = () => {
+    if (!profilePictureDoc?._id || !profilePictureDoc?.fileUrl) return undefined;
+    // If fileUrl is already a full URL, return it; otherwise prepend BASE_URL
+    if (profilePictureDoc.fileUrl.startsWith('http')) {
+      return profilePictureDoc.fileUrl;
+    }
+    return `${BASE_URL}${profilePictureDoc.fileUrl.startsWith('/') ? '' : '/'}${profilePictureDoc.fileUrl}`;
+  };
+
   const name = employee?.preferredName || `${employee?.firstName || ''} ${employee?.lastName || ''}`.trim();
   return (
     <Card
@@ -48,7 +77,13 @@ export default function EmployeeCard({
       ]}
     >
       <Space align="start">
-        <Avatar size={48} icon={<UserOutlined />}>{initialsOf(employee)}</Avatar>
+        <Avatar 
+          size={48} 
+          src={getProfilePictureUrl()}
+          icon={!profilePictureDoc?._id ? <UserOutlined /> : null}
+        >
+          {!profilePictureDoc?._id ? initialsOf(employee) : null}
+        </Avatar>
         <div>
           <Space wrap>
             <Typography.Text strong>{name || employee?.username}</Typography.Text>

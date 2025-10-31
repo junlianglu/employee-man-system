@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Typography, Space, Card } from 'antd';
+import { Typography, Space, Card, Alert } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import {
 
 import EmployeeSearch from '../../components/hr/EmployeeList/EmployeeSearch.jsx';
 import EmployeeSummary from '../../components/hr/EmployeeList/EmployeeSummary.jsx';
+import EmployeeSummaryList from '../../components/hr/EmployeeList/EmployeeSummaryList.jsx';
 
 const { Title, Paragraph } = Typography;
 
@@ -25,21 +26,44 @@ export default function EmployeeProfilesPage() {
 
   const [query, setQuery] = useState({
     page: 1,
-    limit: 12,
+    limit: 1000, // Fetch all for summary view sorting
     search: undefined,
     status: undefined,
     visa: undefined, 
   });
 
-  useEffect(() => {
-    const { page, limit, search, status } = query;
-    dispatch(fetchEmployees({ page, limit, search, status }));
-  }, [dispatch, query.page, query.limit, query.search, query.status]);
+  const [realTimeSearch, setRealTimeSearch] = useState('');
 
+  useEffect(() => {
+    const { page, limit, status } = query;
+    const search = realTimeSearch || query.search;
+    dispatch(fetchEmployees({ page, limit, search, status }));
+  }, [dispatch, query.page, query.limit, query.search, query.status, realTimeSearch]);
+
+  // Filter and search employees locally for real-time search
   const filteredItems = useMemo(() => {
-    if (!query.visa) return employees;
-    return (employees || []).filter((e) => e.citizenshipStatus === query.visa);
-  }, [employees, query.visa]);
+    let filtered = employees || [];
+    
+    // Apply visa filter
+    if (query.visa) {
+      filtered = filtered.filter((e) => e.citizenshipStatus === query.visa);
+    }
+
+    // Apply real-time search filter (first name, last name, preferred name)
+    if (realTimeSearch?.trim()) {
+      const searchLower = realTimeSearch.toLowerCase().trim();
+      filtered = filtered.filter((e) => {
+        const firstName = (e?.firstName || '').toLowerCase();
+        const lastName = (e?.lastName || '').toLowerCase();
+        const preferredName = (e?.preferredName || '').toLowerCase();
+        return firstName.includes(searchLower) || 
+               lastName.includes(searchLower) || 
+               preferredName.includes(searchLower);
+      });
+    }
+
+    return filtered;
+  }, [employees, query.visa, realTimeSearch]);
 
   const loading = employeesStatus === 'loading';
 
@@ -57,8 +81,28 @@ export default function EmployeeProfilesPage() {
     setQuery((q) => ({ ...q, page }));
   };
 
-  const onViewProfile = (employeeId) => navigate(`/hr/employees/${employeeId}`);
+  const onViewProfile = (employeeId) => {
+    // Open in new tab - using window.open
+    window.open(`/hr/hiring/review/${employeeId}`, '_blank', 'noopener,noreferrer');
+  };
   const onViewDocuments = (employeeId) => navigate(`/hr/visa-status`);
+
+  const handleRealTimeSearch = (value) => {
+    setRealTimeSearch(value);
+  };
+
+  // Determine search result message
+  const searchResultMessage = useMemo(() => {
+    if (!realTimeSearch?.trim()) return null;
+    const count = filteredItems.length;
+    if (count === 0) {
+      return <Alert message="No records found" type="info" showIcon style={{ marginBottom: 16 }} />;
+    } else if (count === 1) {
+      return <Alert message="1 record found" type="success" showIcon style={{ marginBottom: 16 }} />;
+    } else {
+      return <Alert message={`${count} records found`} type="info" showIcon style={{ marginBottom: 16 }} />;
+    }
+  }, [realTimeSearch, filteredItems.length]);
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -73,15 +117,13 @@ export default function EmployeeProfilesPage() {
         <EmployeeSearch
           initial={{ search: query.search, status: query.status, visa: query.visa }}
           onSearch={handleSearch}
+          onSearchChange={handleRealTimeSearch}
         />
-        <EmployeeSummary
+        {searchResultMessage}
+        <EmployeeSummaryList
           items={filteredItems}
           loading={loading}
-          pagination={query.visa ? null : pagination}
-          onChangePage={handleChangePage}
-          onViewProfile={onViewProfile}
-          onViewDocuments={onViewDocuments}
-          grid={{ gutter: 16, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 4 }}
+          total={pagination?.total || filteredItems.length}
         />
       </Card>
     </Space>

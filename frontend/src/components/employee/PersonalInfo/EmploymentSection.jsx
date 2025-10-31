@@ -1,23 +1,13 @@
-import React, { useEffect } from 'react';
-import { Card, Form, Select, Input, Button, Space, Row, Col, message, DatePicker } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Form, Select, Input, Button, Space, Row, Col, message, DatePicker, Typography, Popconfirm } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProfile, updateMyProfileThunk } from '../../../features/employee/employeeThunks.js';
 import { selectMyProfile, selectMyProfileStatus, selectMyProfileUpdateStatus } from '../../../features/employee/employeeSelectors.js';
 
-const CITIZENSHIP_OPTIONS = [
-  { label: 'Citizen', value: 'citizen' },
-  { label: 'Permanent Resident', value: 'permanent_resident' },
-  { label: 'Work Visa', value: 'work_visa' },
-];
+const { Text } = Typography;
 
-const WORK_AUTH_OPTIONS = [
-  { label: 'H1-B', value: 'H1-B' },
-  { label: 'L2', value: 'L2' },
-  { label: 'F1 (CPT/OPT)', value: 'F1(CPT/OPT)' },
-  { label: 'H4', value: 'H4' },
-  { label: 'Other', value: 'Other' },
-];
 
 export default function EmploymentSection() {
   const dispatch = useDispatch();
@@ -26,46 +16,62 @@ export default function EmploymentSection() {
   const saving = useSelector(selectMyProfileUpdateStatus) === 'loading';
 
   const [form] = Form.useForm();
+  const [isEditing, setIsEditing] = useState(false);
+  const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => {
     if (!profile) dispatch(fetchMyProfile());
   }, [dispatch, profile]);
 
   useEffect(() => {
-    if (profile) {
-      form.setFieldsValue({
-        citizenshipStatus: profile.citizenshipStatus,
-        workAuthorizationType: profile.workAuthorizationType,
+    if (profile && !isEditing) {
+      const values = {
         visaTitle: profile.visaTitle,
         visaStartDate: profile.visaStartDate ? dayjs(profile.visaStartDate) : undefined,
         visaEndDate: profile.visaEndDate ? dayjs(profile.visaEndDate) : undefined,
-      });
+      };
+      form.setFieldsValue(values);
+      setInitialValues(values);
     }
-  }, [profile, form]);
+  }, [profile, form, isEditing]);
 
-  const onValuesChange = (changed, all) => {
-    if (changed.citizenshipStatus && changed.citizenshipStatus !== 'work_visa') {
-      form.setFieldsValue({
-        workAuthorizationType: undefined,
-        visaTitle: undefined,
-        visaStartDate: undefined,
-        visaEndDate: undefined,
-      });
+
+  const handleEdit = () => {
+    // Capture current form values as initial values before editing
+    const currentValues = form.getFieldsValue();
+    setInitialValues(currentValues);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    // Reset form to initial values
+    if (initialValues) {
+      form.resetFields();
+      form.setFieldsValue(initialValues);
+    } else {
+      // Fallback: reload from profile
+      if (profile) {
+        const values = {
+          visaTitle: profile.visaTitle,
+          visaStartDate: profile.visaStartDate ? dayjs(profile.visaStartDate) : undefined,
+          visaEndDate: profile.visaEndDate ? dayjs(profile.visaEndDate) : undefined,
+        };
+        form.resetFields();
+        form.setFieldsValue(values);
+      } else {
+        form.resetFields();
+      }
     }
-    if (changed.workAuthorizationType && changed.workAuthorizationType !== 'Other') {
-      form.setFieldValue('visaTitle', undefined);
-    }
+    setIsEditing(false);
   };
 
   const onFinish = async (values) => {
     const updateData = {
-      citizenshipStatus: values.citizenshipStatus,
-      workAuthorizationType: values.citizenshipStatus === 'work_visa' ? values.workAuthorizationType : undefined,
-      visaTitle: values.workAuthorizationType === 'Other' ? values.visaTitle : undefined,
-      visaStartDate: values.citizenshipStatus === 'work_visa' && values.visaStartDate
+      visaTitle: profile?.workAuthorizationType === 'Other' ? values.visaTitle : undefined,
+      visaStartDate: isProfileWorkVisa && values.visaStartDate
         ? values.visaStartDate.format('YYYY-MM-DD')
         : undefined,
-      visaEndDate: values.citizenshipStatus === 'work_visa' && values.visaEndDate
+      visaEndDate: isProfileWorkVisa && values.visaEndDate
         ? values.visaEndDate.format('YYYY-MM-DD')
         : undefined,
     };
@@ -74,78 +80,140 @@ export default function EmploymentSection() {
       message.error(res.error.message || 'Failed to save');
     } else {
       message.success('Saved');
+      setIsEditing(false);
+      setInitialValues(form.getFieldsValue());
     }
   };
 
-  const isWorkVisa = Form.useWatch('citizenshipStatus', form) === 'work_visa';
-  const workAuth = Form.useWatch('workAuthorizationType', form);
+  const workAuth = profile?.workAuthorizationType;
+
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    return dayjs(date).format('MM/DD/YYYY');
+  };
+
+  if (loading) {
+    return <Card title="Work Authorization" loading bordered={false} />;
+  }
+
+  const isProfileWorkVisa = profile?.citizenshipStatus === 'work_visa';
 
   return (
-    <Card title="Work Authorization" loading={loading} bordered={false}>
-      <Form form={form} layout="vertical" onValuesChange={onValuesChange} onFinish={onFinish}>
-        <Row gutter={16}>
-          <Col xs={24} md={8}>
-            <Form.Item
-              label="Citizenship Status"
-              name="citizenshipStatus"
-              rules={[{ required: true, message: 'Citizenship status is required' }]}
+    <Card
+      title="Employment"
+      bordered={false}
+      extra={
+        !isEditing ? (
+          <Button icon={<EditOutlined />} onClick={handleEdit}>
+            Edit
+          </Button>
+        ) : (
+          <Space>
+            <Popconfirm
+              title="Discard changes?"
+              description="Are you sure you want to discard all your changes?"
+              onConfirm={handleCancel}
+              okText="Yes"
+              cancelText="No"
+              okType="danger"
             >
-              <Select options={CITIZENSHIP_OPTIONS} placeholder="Select status" />
-            </Form.Item>
-          </Col>
+              <Button type="button" disabled={saving}>
+                Cancel
+              </Button>
+            </Popconfirm>
+            <Button type="primary" onClick={() => form.submit()} loading={saving}>
+              Save
+            </Button>
+          </Space>
+        )
+      }
+    >
+      <Form form={form} layout="vertical" onFinish={onFinish} disabled={!isEditing}>
+        {!isEditing ? (
+          <>
+            {isProfileWorkVisa ? (
+              <>
+                {profile?.workAuthorizationType === 'Other' && (
+                  <Row gutter={16}>
+                    <Col xs={24} md={8}>
+                      <div>
+                        <Text type="secondary">Visa Title</Text>
+                        <div><Text strong>{profile?.visaTitle || 'N/A'}</Text></div>
+                      </div>
+                    </Col>
+                  </Row>
+                )}
+                <Row gutter={16} style={{ marginTop: profile?.workAuthorizationType === 'Other' ? 16 : 0 }}>
+                  <Col xs={24} md={8}>
+                    <div>
+                      <Text type="secondary">Visa Start Date</Text>
+                      <div><Text strong>{formatDate(profile?.visaStartDate)}</Text></div>
+                    </div>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <div>
+                      <Text type="secondary">Visa End Date</Text>
+                      <div><Text strong>{formatDate(profile?.visaEndDate)}</Text></div>
+                    </div>
+                  </Col>
+                </Row>
+              </>
+            ) : (
+              <Row gutter={16}>
+                <Col xs={24}>
+                  <Text type="secondary">No visa information available</Text>
+                </Col>
+              </Row>
+            )}
+          </>
+        ) : (
+          <>
+            {isProfileWorkVisa ? (
+              <>
+                {workAuth === 'Other' && (
+                  <Row gutter={16}>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        label="Visa Title"
+                        name="visaTitle"
+                        rules={[{ required: true, message: 'Visa title is required' }]}
+                      >
+                        <Input placeholder="Enter visa title" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                )}
 
-          {isWorkVisa && (
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Work Authorization Type"
-                name="workAuthorizationType"
-                rules={[{ required: true, message: 'Work authorization is required' }]}
-              >
-                <Select options={WORK_AUTH_OPTIONS} placeholder="Select type" />
-              </Form.Item>
-            </Col>
-          )}
-
-          {isWorkVisa && workAuth === 'Other' && (
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Visa Title"
-                name="visaTitle"
-                rules={[{ required: true, message: 'Visa title is required' }]}
-              >
-                <Input placeholder="Enter visa title" />
-              </Form.Item>
-            </Col>
-          )}
-        </Row>
-
-        {isWorkVisa && (
-          <Row gutter={16}>
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Visa Start Date"
-                name="visaStartDate"
-                rules={[{ required: true, message: 'Start date is required' }]}
-              >
-                <DatePicker style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Visa End Date"
-                name="visaEndDate"
-                rules={[{ required: true, message: 'End date is required' }]}
-              >
-                <DatePicker style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
+                <Row gutter={16}>
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      label="Visa Start Date"
+                      name="visaStartDate"
+                      rules={[{ required: true, message: 'Start date is required' }]}
+                    >
+                      <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      label="Visa End Date"
+                      name="visaEndDate"
+                      rules={[{ required: true, message: 'End date is required' }]}
+                    >
+                      <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </>
+            ) : (
+              <Row gutter={16}>
+                <Col xs={24}>
+                  <Text type="secondary">No visa information available</Text>
+                </Col>
+              </Row>
+            )}
+          </>
         )}
-
-        <Space>
-          <Button type="primary" htmlType="submit" loading={saving}>Save</Button>
-          <Button onClick={() => form.resetFields()} disabled={saving}>Reset</Button>
-        </Space>
       </Form>
     </Card>
   );

@@ -1,5 +1,4 @@
-import { Form, Input, Row, Col, Button, Space } from 'antd';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Form, Input, Row, Col } from 'antd';
 import { useState, useEffect, useRef } from 'react';
 
 export default function EmployeeSearch({ initial = {}, onSearch, onSearchChange }) {
@@ -26,49 +25,35 @@ export default function EmployeeSearch({ initial = {}, onSearch, onSearchChange 
     };
   }, [searchValue, onSearchChange]);
 
-  const handleFinish = (values) => {
-    const cleaned = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v !== undefined && v !== null && String(v).trim() !== '')
-    );
-    onSearch?.(cleaned);
-  };
-
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
     form.setFieldsValue({ search: value });
   };
 
+  const handleClear = () => {
+    setSearchValue('');
+    form.setFieldsValue({ search: '' });
+    if (onSearchChange) {
+      onSearchChange('');
+    }
+  };
+
   return (
-    <Form
-      layout="vertical"
-      form={form}
-      initialValues={initial}
-      onFinish={handleFinish}
-      style={{ marginBottom: 16 }}
-    >
+    <div style={{ marginBottom: 16 }}>
       <Row gutter={12}>
-        <Col xs={24} md={10}>
+        <Col xs={24} md={24}>
           <Form.Item name="search" label="Search (First Name, Last Name, Preferred Name)">
             <Input 
               placeholder="Type to search..." 
               allowClear 
               value={searchValue}
               onChange={handleSearchChange}
+              onClear={handleClear}
             />
           </Form.Item>
         </Col>
-        <Col xs={24} md={6} style={{ display: 'flex', alignItems: 'end' }}>
-          <Space>
-            <Button icon={<ReloadOutlined />} onClick={() => { form.resetFields(); onSearch?.({}); }}>
-              Reset
-            </Button>
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              Search
-            </Button>
-          </Space>
-        </Col>
       </Row>
-    </Form>
+    </div>
   );
 }

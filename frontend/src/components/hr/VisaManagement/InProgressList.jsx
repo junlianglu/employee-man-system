@@ -115,7 +115,16 @@ export default function InProgressList({
             </Space>
           );
         }
-        if (r.nextStep && !r.nextStep.includes('Waiting for HR')) {
+        
+        // Don't show Send Notification if waiting for HR (onboarding or document review)
+        if (r.nextStep && 
+            (r.nextStep.includes('Waiting for HR') || 
+             r.nextStep.includes('Wait for HR'))) {
+          return <Text type="secondary">No action needed</Text>;
+        }
+        
+        // Show Send Notification for other cases (employee needs to take action)
+        if (r.nextStep) {
           return (
             <Button
               size="small"
@@ -127,6 +136,7 @@ export default function InProgressList({
             </Button>
           );
         }
+        
         return <Text type="secondary">No action needed</Text>;
       },
       width: 180,

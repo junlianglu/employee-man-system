@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Card, Table, Button, Space, Typography, Input } from 'antd';
 import { EyeOutlined, SendOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import './InProgressList.css';
 
 const { Text } = Typography;
 
@@ -40,21 +41,30 @@ export default function InProgressList({
         return fullName || r.preferredName || r.username;
       },
       ellipsis: true,
+      width: 150,
+      fixed: 'left',
     },
     {
       title: 'Work Authorization',
       key: 'workAuth',
-      render: (_, r) => (
-        <Space direction="vertical" size={0}>
-          <Text strong>{r.workAuthorizationType || '—'}</Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {r.visaStartDate ? dayjs(r.visaStartDate).format('MMM DD, YYYY') : '—'} → {r.visaEndDate ? dayjs(r.visaEndDate).format('MMM DD, YYYY') : '—'}
-          </Text>
-          <Text type={daysLeft(r.visaEndDate) <= 30 ? 'danger' : daysLeft(r.visaEndDate) <= 90 ? 'warning' : undefined} style={{ fontSize: 12 }}>
-            {daysLeft(r.visaEndDate) !== null ? `${daysLeft(r.visaEndDate)} days remaining` : '—'}
-          </Text>
-        </Space>
-      ),
+      render: (_, r) => {
+        // If this is a registration token or employee hasn't submitted onboarding yet
+        if (r.isToken || !r.workAuthorizationType) {
+          return <Text type="secondary">Not yet determined</Text>;
+        }
+        return (
+          <Space direction="vertical" size={0}>
+            <Text strong>{r.workAuthorizationType || '—'}</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {r.visaStartDate ? dayjs(r.visaStartDate).format('MMM DD, YYYY') : '—'} → {r.visaEndDate ? dayjs(r.visaEndDate).format('MMM DD, YYYY') : '—'}
+            </Text>
+            <Text type={daysLeft(r.visaEndDate) <= 30 ? 'danger' : daysLeft(r.visaEndDate) <= 90 ? 'warning' : undefined} style={{ fontSize: 12 }}>
+              {daysLeft(r.visaEndDate) !== null ? `${daysLeft(r.visaEndDate)} days remaining` : '—'}
+            </Text>
+          </Space>
+        );
+      },
+      width: 200,
     },
     {
       title: 'Next Steps',
@@ -63,14 +73,38 @@ export default function InProgressList({
         <Text style={{ whiteSpace: 'pre-wrap' }}>{r.nextStep || '—'}</Text>
       ),
       ellipsis: { showTitle: false },
+      width: 250,
     },
     {
       title: 'Action',
       key: 'action',
       render: (_, r) => {
+        // Registration tokens or employees without _id (edge case)
+        if (r.isToken || !r._id) {
+          return (
+            <Button
+              size="small"
+              type="primary"
+              icon={<SendOutlined />}
+              onClick={() => {
+                // For tokens, we might need to handle differently
+                // For now, only enable if we have an email-based ID
+                if (r.email) {
+                  // Note: This might need backend support for token-based notifications
+                  // For now, disable the button or show a message
+                  console.warn('Notification not yet supported for registration tokens');
+                }
+              }}
+              disabled={r.isToken} // Disable for tokens until backend supports it
+            >
+              Send Notification
+            </Button>
+          );
+        }
+        
         if (r.pendingDoc) {
           return (
-            <Space>
+            <Space size="small" wrap>
               <Button
                 size="small"
                 icon={<EyeOutlined />}
@@ -95,6 +129,7 @@ export default function InProgressList({
         }
         return <Text type="secondary">No action needed</Text>;
       },
+      width: 180,
     },
   ], [onViewDocument, onSendNotification]);
 
@@ -107,9 +142,11 @@ export default function InProgressList({
           value={searchValue}
           onChange={(e) => onSearchChange?.(e.target.value)}
           allowClear
-          style={{ width: 250 }}
+          style={{ width: '100%', maxWidth: 250 }}
+          className="in-progress-search"
         />
       }
+      className="in-progress-list-card"
     >
       {filteredItems.length === 0 && !loading && (
         <div style={{ textAlign: 'center', padding: 40 }}>
@@ -118,19 +155,23 @@ export default function InProgressList({
           </Text>
         </div>
       )}
-      <Table
-        rowKey={(r) => r._id}
-        columns={columns}
-        dataSource={filteredItems}
-        loading={loading}
-        pagination={pagination ? {
-          current: pagination.page || 1,
-          pageSize: pagination.limit || 10,
-          total: pagination.total || 0,
-          showSizeChanger: false,
-          onChange: onChangePage,
-        } : false}
-      />
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          rowKey={(r) => r._id || `token-${r.email}`}
+          columns={columns}
+          dataSource={filteredItems}
+          loading={loading}
+          pagination={pagination ? {
+            current: pagination.page || 1,
+            pageSize: pagination.limit || 10,
+            total: pagination.total || 0,
+            showSizeChanger: false,
+            onChange: onChangePage,
+          } : false}
+          scroll={{ x: 'max-content' }}
+          size="middle"
+        />
+      </div>
     </Card>
   );
 }

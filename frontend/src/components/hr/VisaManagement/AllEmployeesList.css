@@ -1,0 +1,53 @@
+/* Responsive design for All Employees List */
+.all-employees-list-card {
+  width: 100%;
+}
+
+.all-employees-list-card .ant-card-body {
+  padding: 24px;
+}
+
+.all-employees-search {
+  width: 300px;
+  max-width: 100%;
+}
+
+/* Mobile devices */
+@media (max-width: 767px) {
+  .all-employees-list-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .all-employees-list-card .ant-card-head {
+    padding: 0 12px;
+  }
+
+  .all-employees-list-card .ant-card-head-title {
+    font-size: 16px;
+  }
+
+  .all-employees-search-wrapper {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .all-employees-search {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .all-employees-list-card .ant-card-extra {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 0;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .all-employees-list-card .ant-card-body {
+    padding: 16px;
+  }
+}
+

@@ -68,7 +68,7 @@ export default function ApplicationReview({
                   description={
                     <Space direction="vertical" size={0}>
                       <Typography.Text type="secondary">{e.email}</Typography.Text>
-                      <Typography.Text type="secondary">@{e.username}</Typography.Text>
+                      <Typography.Text type="secondary">{e.username}</Typography.Text>
                     </Space>
                   }
                 />

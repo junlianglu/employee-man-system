@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Card, Table, Button, Space, Tag, Tooltip } from 'antd';
 import { EyeOutlined, DownloadOutlined, CheckOutlined, CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import FeedbackModal from '../../common/Modals/FeedbackModal.jsx';
+import './DocumentApproval.css';
 
 function statusTag(status) {
   if (status === 'approved') return <Tag color="green">Approved</Tag>;
@@ -26,9 +27,23 @@ export default function DocumentApproval({
       dataIndex: 'type',
       key: 'type',
       render: (v) => (v || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      width: 120,
     },
-    { title: 'File', dataIndex: 'fileName', key: 'fileName', render: (v) => v || '—' },
-    { title: 'Status', dataIndex: 'status', key: 'status', render: (v) => statusTag(v) },
+    { 
+      title: 'File', 
+      dataIndex: 'fileName', 
+      key: 'fileName', 
+      render: (v) => v || '—',
+      width: 150,
+      ellipsis: true,
+    },
+    { 
+      title: 'Status', 
+      dataIndex: 'status', 
+      key: 'status', 
+      render: (v) => statusTag(v),
+      width: 100,
+    },
     {
       title: 'Feedback',
       dataIndex: 'hrFeedback',
@@ -39,40 +54,62 @@ export default function DocumentApproval({
         </Tooltip>
       ) : '—',
       ellipsis: true,
+      width: 200,
     },
-    { title: 'Reviewed At', dataIndex: 'reviewedAt', key: 'reviewedAt', render: (v) => v ? new Date(v).toLocaleString() : '—' },
+    { 
+      title: 'Reviewed At', 
+      dataIndex: 'reviewedAt', 
+      key: 'reviewedAt', 
+      render: (v) => v ? new Date(v).toLocaleString() : '—',
+      width: 160,
+    },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, r) => (
-        <Space>
+        <Space size="small" wrap>
           <Tooltip title="View">
-            <Button icon={<EyeOutlined />} onClick={() => onView?.(r._id)} />
+            <Button size="small" icon={<EyeOutlined />} onClick={() => onView?.(r._id)} />
           </Tooltip>
           <Tooltip title="Download">
-            <Button icon={<DownloadOutlined />} onClick={() => onDownload?.(r._id)} />
+            <Button size="small" icon={<DownloadOutlined />} onClick={() => onDownload?.(r._id)} />
           </Tooltip>
-          <Button type="primary" icon={<CheckOutlined />} onClick={() => setModal({ open: true, docId: r._id, initialStatus: 'approved' })}>
+          <Button 
+            size="small"
+            type="primary" 
+            icon={<CheckOutlined />} 
+            onClick={() => setModal({ open: true, docId: r._id, initialStatus: 'approved' })}
+          >
             Approve
           </Button>
-          <Button danger icon={<CloseOutlined />} onClick={() => setModal({ open: true, docId: r._id, initialStatus: 'rejected' })}>
+          <Button 
+            size="small"
+            danger 
+            icon={<CloseOutlined />} 
+            onClick={() => setModal({ open: true, docId: r._id, initialStatus: 'rejected' })}
+          >
             Reject
           </Button>
         </Space>
       ),
+      width: 250,
     },
   ], [onView, onDownload]);
 
   return (
     <>
-      <Card title="Pending Document Reviews">
-        <Table
-          rowKey={(r) => r._id}
-          columns={columns}
-          dataSource={documents}
-          loading={loading}
-          pagination={false}
-        />
+      <Card title="Pending Document Reviews" className="document-approval-card">
+        <div style={{ overflowX: 'auto' }}>
+          <Table
+            rowKey={(r) => r._id}
+            columns={columns}
+            dataSource={documents}
+            loading={loading}
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+            size="middle"
+          />
+        </div>
       </Card>
 
       <FeedbackModal

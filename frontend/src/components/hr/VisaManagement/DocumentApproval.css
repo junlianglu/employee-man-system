@@ -1,0 +1,31 @@
+/* Responsive design for Document Approval */
+.document-approval-card {
+  width: 100%;
+}
+
+.document-approval-card .ant-card-body {
+  padding: 24px;
+}
+
+/* Mobile devices */
+@media (max-width: 767px) {
+  .document-approval-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .document-approval-card .ant-card-head {
+    padding: 0 12px;
+  }
+
+  .document-approval-card .ant-card-head-title {
+    font-size: 16px;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .document-approval-card .ant-card-body {
+    padding: 16px;
+  }
+}
+

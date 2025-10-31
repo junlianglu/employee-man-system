@@ -2,18 +2,13 @@ import React, { useEffect, useMemo } from 'react';
 import { Typography, Space, Card, Divider, Button, Row, Col, Alert } from 'antd';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
-
 import { fetchMyProfile } from '../../features/employee/employeeThunks.js';
 import { selectMyProfile } from '../../features/employee/employeeSelectors.js';
-
 import { fetchMyDocuments } from '../../features/document/documentThunks.js';
 import { selectMyDocuments, selectMyDocumentsStatus } from '../../features/document/documentSelectors.js';
-
-import { uploadMyDocument } from '../../features/document/documentThunks.js';
 import DocumentUpload from '../../components/common/Documents/DocumentUpload.jsx';
-import DocumentList from '../../components/common/Documents/DocumentList.jsx';
 import StatusBadge from '../../components/common/Status/StatusBadge.jsx';
-import { message } from 'antd';
+import { message as antdMessage } from 'antd';
 import { downloadTemplate } from '../../api/documents.js';
 
 const { Title, Paragraph, Text } = Typography;
@@ -49,7 +44,6 @@ export default function VisaStatusPage() {
   const dispatch = useDispatch();
   const profile = useSelector(selectMyProfile);
   const docs = useSelector(selectMyDocuments);
-  const docsStatus = useSelector(selectMyDocumentsStatus);
 
   useEffect(() => {
     dispatch(fetchMyDocuments());
@@ -166,7 +160,7 @@ export default function VisaStatusPage() {
                     document.body.removeChild(link);
                     setTimeout(() => URL.revokeObjectURL(url), 100);
                   } catch (err) {
-                    message.error('Failed to download template');
+                    antdMessage.error('Failed to download template');
                   }
                 }}
               >
@@ -186,7 +180,7 @@ export default function VisaStatusPage() {
                     document.body.removeChild(link);
                     setTimeout(() => URL.revokeObjectURL(url), 100);
                   } catch (err) {
-                    message.error('Failed to download template');
+                    antdMessage.error('Failed to download template');
                   }
                 }}
               >
@@ -246,10 +240,6 @@ export default function VisaStatusPage() {
       {renderDocCard('opt_ead', 'OPT EAD')}
       {renderDocCard('i983', 'I-983', true)}
       {renderDocCard('i20', 'I-20')}
-
-      <Card bordered={false} title="All Documents" loading={docsStatus === 'loading'}>
-        <DocumentList />
-      </Card>
     </Space>
   );
 }

@@ -135,28 +135,28 @@ export default function ContactSection() {
             </Col>
           </Row>
         ) : (
-          <Row gutter={16}>
-            <Col xs={24} md={8}>
-              <Form.Item
-                label="Cell Phone"
-                name="cellPhone"
-                rules={[{ required: true, message: 'Cell phone is required' }]}
-              >
-                <Input placeholder="(555) 555-5555" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={8}>
-              <Form.Item label="Work Phone" name="workPhone">
-                <Input placeholder="(555) 555-5555" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={8}>
-              <Form.Item label="Email" name="email">
-                <Input disabled />
-              </Form.Item>
-              <Text type="secondary">Email is managed by the system.</Text>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col xs={24} md={8}>
+            <Form.Item
+              label="Cell Phone"
+              name="cellPhone"
+              rules={[{ required: true, message: 'Cell phone is required' }]}
+            >
+              <Input placeholder="(555) 555-5555" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item label="Work Phone" name="workPhone">
+              <Input placeholder="(555) 555-5555" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item label="Email" name="email">
+              <Input disabled />
+            </Form.Item>
+            <Text type="secondary">Email is managed by the system.</Text>
+          </Col>
+        </Row>
         )}
       </Form>
     </Card>

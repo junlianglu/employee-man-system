@@ -170,97 +170,97 @@ export default function EmergencyContactSection() {
             )}
           </>
         ) : (
-          <Form.List name="emergencyContacts">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map((field) => (
-                  <Card
-                    key={field.key}
-                    type="inner"
-                    title={`Contact ${field.name + 1}`}
-                    style={{ marginBottom: 12 }}
-                    extra={
-                      fields.length > 1 && (
+        <Form.List name="emergencyContacts">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map((field) => (
+                <Card
+                  key={field.key}
+                  type="inner"
+                  title={`Contact ${field.name + 1}`}
+                  style={{ marginBottom: 12 }}
+                  extra={
+                    fields.length > 1 && (
                         <Button danger size="small" icon={<MinusCircleOutlined />} onClick={() => remove(field.name)}>
-                          Remove
-                        </Button>
-                      )
-                    }
-                  >
-                    <Row gutter={16}>
-                      <Col xs={24} md={8}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'firstName']}
-                          label="First Name"
-                          rules={[{ required: true, message: 'First name is required' }]}
-                        >
-                          <Input placeholder="First name" />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} md={8}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'middleName']}
-                          label="Middle Name"
-                        >
-                          <Input placeholder="Middle name" />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} md={8}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'lastName']}
-                          label="Last Name"
-                          rules={[{ required: true, message: 'Last name is required' }]}
-                        >
-                          <Input placeholder="Last name" />
-                        </Form.Item>
-                      </Col>
-                    </Row>
+                        Remove
+                      </Button>
+                    )
+                  }
+                >
+                  <Row gutter={16}>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'firstName']}
+                        label="First Name"
+                        rules={[{ required: true, message: 'First name is required' }]}
+                      >
+                        <Input placeholder="First name" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'middleName']}
+                        label="Middle Name"
+                      >
+                        <Input placeholder="Middle name" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'lastName']}
+                        label="Last Name"
+                        rules={[{ required: true, message: 'Last name is required' }]}
+                      >
+                        <Input placeholder="Last name" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-                    <Row gutter={16}>
-                      <Col xs={24} md={8}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'relationship']}
-                          label="Relationship"
-                          rules={[{ required: true, message: 'Relationship is required' }]}
-                        >
-                          <Input placeholder="Relationship" />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} md={8}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'phone']}
-                          label="Phone"
-                        >
-                          <Input placeholder="(555) 555-5555" />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} md={8}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'email']}
-                          label="Email"
-                          rules={[{ type: 'email', message: 'Invalid email' }]}
-                        >
-                          <Input placeholder="email@example.com" />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  </Card>
-                ))}
+                  <Row gutter={16}>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'relationship']}
+                        label="Relationship"
+                        rules={[{ required: true, message: 'Relationship is required' }]}
+                      >
+                        <Input placeholder="Relationship" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'phone']}
+                        label="Phone"
+                      >
+                        <Input placeholder="(555) 555-5555" />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'email']}
+                        label="Email"
+                        rules={[{ type: 'email', message: 'Invalid email' }]}
+                      >
+                        <Input placeholder="email@example.com" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Card>
+              ))}
 
-                <Space style={{ marginBottom: 16 }}>
+              <Space style={{ marginBottom: 16 }}>
                   <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                    Add Contact
-                  </Button>
-                </Space>
-              </>
-            )}
-          </Form.List>
+                  Add Contact
+                </Button>
+              </Space>
+            </>
+          )}
+        </Form.List>
         )}
       </Form>
     </Card>

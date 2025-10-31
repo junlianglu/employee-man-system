@@ -60,7 +60,7 @@ export default function EmploymentSection() {
         form.setFieldsValue(values);
       } else {
         form.resetFields();
-      }
+    }
     }
     setIsEditing(false);
   };
@@ -134,8 +134,8 @@ export default function EmploymentSection() {
             {isProfileWorkVisa ? (
               <>
                 {profile?.workAuthorizationType === 'Other' && (
-                  <Row gutter={16}>
-                    <Col xs={24} md={8}>
+        <Row gutter={16}>
+          <Col xs={24} md={8}>
                       <div>
                         <Text type="secondary">Visa Title</Text>
                         <div><Text strong>{profile?.visaTitle || 'N/A'}</Text></div>
@@ -149,8 +149,8 @@ export default function EmploymentSection() {
                       <Text type="secondary">Visa Start Date</Text>
                       <div><Text strong>{formatDate(profile?.visaStartDate)}</Text></div>
                     </div>
-                  </Col>
-                  <Col xs={24} md={8}>
+          </Col>
+            <Col xs={24} md={8}>
                     <div>
                       <Text type="secondary">Visa End Date</Text>
                       <div><Text strong>{formatDate(profile?.visaEndDate)}</Text></div>
@@ -162,9 +162,9 @@ export default function EmploymentSection() {
               <Row gutter={16}>
                 <Col xs={24}>
                   <Text type="secondary">No visa information available</Text>
-                </Col>
+            </Col>
               </Row>
-            )}
+          )}
           </>
         ) : (
           <>
@@ -172,38 +172,38 @@ export default function EmploymentSection() {
               <>
                 {workAuth === 'Other' && (
                   <Row gutter={16}>
-                    <Col xs={24} md={8}>
-                      <Form.Item
-                        label="Visa Title"
-                        name="visaTitle"
-                        rules={[{ required: true, message: 'Visa title is required' }]}
-                      >
-                        <Input placeholder="Enter visa title" />
-                      </Form.Item>
-                    </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="Visa Title"
+                name="visaTitle"
+                rules={[{ required: true, message: 'Visa title is required' }]}
+              >
+                <Input placeholder="Enter visa title" />
+              </Form.Item>
+            </Col>
                   </Row>
-                )}
+          )}
 
-                <Row gutter={16}>
-                  <Col xs={24} md={8}>
-                    <Form.Item
-                      label="Visa Start Date"
-                      name="visaStartDate"
-                      rules={[{ required: true, message: 'Start date is required' }]}
-                    >
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="Visa Start Date"
+                name="visaStartDate"
+                rules={[{ required: true, message: 'Start date is required' }]}
+              >
                       <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={8}>
-                    <Form.Item
-                      label="Visa End Date"
-                      name="visaEndDate"
-                      rules={[{ required: true, message: 'End date is required' }]}
-                    >
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="Visa End Date"
+                name="visaEndDate"
+                rules={[{ required: true, message: 'End date is required' }]}
+              >
                       <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                </Row>
+              </Form.Item>
+            </Col>
+          </Row>
               </>
             ) : (
               <Row gutter={16}>

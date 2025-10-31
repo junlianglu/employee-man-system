@@ -61,31 +61,37 @@ export default function HiringManagementPage() {
   const handleRefreshList = () => dispatch(fetchOnboardingApplications(filter));
 
   return (
-    <Row gutter={[16, 16]} className="hiring-management-container">
-      <Col xs={24} lg={10}>
-        <TokenGenerator
-          loading={createStatus === 'loading'}
-          onGenerate={handleGenerate}
-          lastToken={lastToken}
-          onReset={() => {}}
-        />
-        <div style={{ height: 16 }} />
-        <TokenHistory
-          tokens={tokens}
-          loading={tokensStatus === 'loading'}
-          onRefresh={() => dispatch(fetchRegistrationTokens())}
-        />
-      </Col>
+    <div className="hiring-management-container">
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={10}>
+          <TokenGenerator
+            loading={createStatus === 'loading'}
+            onGenerate={handleGenerate}
+            lastToken={lastToken}
+            onReset={() => {}}
+          />
+        </Col>
 
-      <Col xs={24} lg={14}>
-        <ApplicationReview
-          applications={apps}
-          listLoading={appsStatus === 'loading'}
-          filter={filter}
-          onChangeFilter={setFilter}
-          onRefreshList={handleRefreshList}
-        />
-      </Col>
-    </Row>
+        <Col xs={24} lg={14}>
+          <ApplicationReview
+            applications={apps}
+            listLoading={appsStatus === 'loading'}
+            filter={filter}
+            onChangeFilter={setFilter}
+            onRefreshList={handleRefreshList}
+          />
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+        <Col xs={24}>
+          <TokenHistory
+            tokens={tokens}
+            loading={tokensStatus === 'loading'}
+            onRefresh={() => dispatch(fetchRegistrationTokens())}
+          />
+        </Col>
+      </Row>
+    </div>
   );
 }

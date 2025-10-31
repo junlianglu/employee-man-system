@@ -22,7 +22,7 @@ export default function TokenHistory({
       ),
       ellipsis: true,
       width: 140,
-      responsive: ['xs', 'sm', 'md', 'lg'],
+      fixed: 'left',
     },
     { 
       title: 'Email', 
@@ -30,7 +30,6 @@ export default function TokenHistory({
       key: 'email', 
       ellipsis: true,
       width: 180,
-      responsive: ['xs', 'sm', 'md', 'lg'],
     },
     {
       title: 'Token',
@@ -51,7 +50,6 @@ export default function TokenHistory({
         </Space>
       ),
       width: 160,
-      responsive: ['md', 'lg'],
     },
     {
       title: 'Link',
@@ -72,7 +70,6 @@ export default function TokenHistory({
         </Space>
       ),
       width: 140,
-      responsive: ['md', 'lg'],
     },
     { 
       title: 'Created', 
@@ -80,7 +77,6 @@ export default function TokenHistory({
       key: 'createdAt', 
       render: (v) => v ? new Date(v).toLocaleString() : '—',
       width: 160,
-      responsive: ['sm', 'md', 'lg'],
     },
     { 
       title: 'Expires', 
@@ -88,7 +84,6 @@ export default function TokenHistory({
       key: 'expiresAt', 
       render: (v) => v ? new Date(v).toLocaleString() : '—',
       width: 160,
-      responsive: ['lg'],
     },
     { 
       title: 'Submitted', 
@@ -96,14 +91,12 @@ export default function TokenHistory({
       key: 'submittedAt', 
       render: (v) => v ? new Date(v).toLocaleString() : '—',
       width: 160,
-      responsive: ['lg'],
     },
     { 
       title: 'Status', 
       key: 'status', 
       render: (_, r) => statusTag(r),
       width: 100,
-      responsive: ['xs', 'sm', 'md', 'lg'],
     },
   ];
 
@@ -123,7 +116,7 @@ export default function TokenHistory({
       }
       className="token-history-card"
     >
-      <div style={{ overflowX: 'auto' }}>
+      <div className="token-history-table-wrapper">
         <Table
           rowKey={(r) => r._id || `${r.email}-${r.token}`}
           columns={columns}

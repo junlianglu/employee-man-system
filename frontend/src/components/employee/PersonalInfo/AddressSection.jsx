@@ -154,52 +154,52 @@ export default function AddressSection() {
           </Row>
         ) : (
           <>
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Street"
-                  name={['address', 'street']}
-                  rules={[{ required: true, message: 'Street is required' }]}
-                >
-                  <Input placeholder="123 Main St" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item label="Unit" name={['address', 'unit']}>
-                  <Input placeholder="Apt, Suite (optional)" />
-                </Form.Item>
-              </Col>
-            </Row>
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              label="Street"
+              name={['address', 'street']}
+              rules={[{ required: true, message: 'Street is required' }]}
+            >
+              <Input placeholder="123 Main St" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item label="Unit" name={['address', 'unit']}>
+              <Input placeholder="Apt, Suite (optional)" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-            <Row gutter={16}>
-              <Col xs={24} md={8}>
-                <Form.Item
-                  label="City"
-                  name={['address', 'city']}
-                  rules={[{ required: true, message: 'City is required' }]}
-                >
-                  <Input placeholder="City" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={8}>
-                <Form.Item
-                  label="State"
-                  name={['address', 'state']}
-                  rules={[{ required: true, message: 'State is required' }]}
-                >
-                  <Input placeholder="State" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={8}>
-                <Form.Item
-                  label="ZIP"
-                  name={['address', 'zip']}
-                  rules={[{ required: true, message: 'ZIP is required' }]}
-                >
-                  <Input placeholder="ZIP" />
-                </Form.Item>
-              </Col>
-            </Row>
+        <Row gutter={16}>
+          <Col xs={24} md={8}>
+            <Form.Item
+              label="City"
+              name={['address', 'city']}
+              rules={[{ required: true, message: 'City is required' }]}
+            >
+              <Input placeholder="City" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item
+              label="State"
+              name={['address', 'state']}
+              rules={[{ required: true, message: 'State is required' }]}
+            >
+              <Input placeholder="State" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item
+              label="ZIP"
+              name={['address', 'zip']}
+              rules={[{ required: true, message: 'ZIP is required' }]}
+            >
+              <Input placeholder="ZIP" />
+            </Form.Item>
+          </Col>
+        </Row>
           </>
         )}
       </Form>

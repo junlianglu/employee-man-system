@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Form, Select, Input, Button, Space, Row, Col, message, DatePicker, Typography, Popconfirm } from 'antd';
+import { Card, Form, Input, Button, Space, Row, Col, message, DatePicker, Typography, Popconfirm } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,19 +37,16 @@ export default function EmploymentSection() {
 
 
   const handleEdit = () => {
-    // Capture current form values as initial values before editing
     const currentValues = form.getFieldsValue();
     setInitialValues(currentValues);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
-    // Reset form to initial values
     if (initialValues) {
       form.resetFields();
       form.setFieldsValue(initialValues);
     } else {
-      // Fallback: reload from profile
       if (profile) {
         const values = {
           visaTitle: profile.visaTitle,

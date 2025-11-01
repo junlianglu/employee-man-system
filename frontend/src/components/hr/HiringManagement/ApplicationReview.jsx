@@ -1,4 +1,4 @@
-import { Card, Row, Col, List, Tag, Typography, Space, Button, Form, Select } from 'antd';
+import { Card, List, Tag, Typography, Space, Button, Form, Select } from 'antd';
 import { EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 
 function statusTag(status) {

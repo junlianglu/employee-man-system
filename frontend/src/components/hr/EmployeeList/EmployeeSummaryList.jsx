@@ -1,4 +1,4 @@
-import { Table, Typography, Tag, Space } from 'antd';
+import { Table, Typography, Space } from 'antd';
 import './EmployeeSummaryList.css';
 
 const { Text } = Typography;
@@ -98,7 +98,6 @@ export default function EmployeeSummaryList({
     },
   ];
 
-  // Sort by last name alphabetically
   const sortedItems = [...items].sort((a, b) => {
     const aLast = (a?.lastName || '').toLowerCase();
     const bLast = (b?.lastName || '').toLowerCase();

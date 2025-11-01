@@ -1,4 +1,3 @@
-// backend/scripts/seedHR.js
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { Employee } from '../models/Employee.js';

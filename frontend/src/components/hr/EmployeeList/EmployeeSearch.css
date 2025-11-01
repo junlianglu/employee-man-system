@@ -1,6 +1,3 @@
-/* Responsive design for Employee Search */
-
-/* Mobile devices */
 @media (max-width: 767px) {
   .employee-search-container {
     margin-bottom: 12px;

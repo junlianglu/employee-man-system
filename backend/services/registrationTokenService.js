@@ -136,7 +136,6 @@ export const completeRegistration = async (token, employeeData) => {
     firstName: registrationToken.firstName,
     middleName: registrationToken.middleName,
     lastName: registrationToken.lastName,
-    // onboardingReview defaults to never_submitted per schema
   });
   
   await employee.save();

@@ -35,7 +35,6 @@ export default function InProgressList({
       title: 'Work Authorization',
       key: 'workAuth',
       render: (_, r) => {
-        // If this is a registration token or employee hasn't submitted onboarding yet
         if (r.isToken || !r.workAuthorizationType) {
           return <Text type="secondary">Not yet determined</Text>;
         }
@@ -66,7 +65,6 @@ export default function InProgressList({
       title: 'Action',
       key: 'action',
       render: (_, r) => {
-        // Registration tokens or employees without _id (edge case)
         if (r.isToken || !r._id) {
           return (
             <Button
@@ -74,15 +72,11 @@ export default function InProgressList({
               type="primary"
               icon={<SendOutlined />}
               onClick={() => {
-                // For tokens, we might need to handle differently
-                // For now, only enable if we have an email-based ID
                 if (r.email) {
-                  // Note: This might need backend support for token-based notifications
-                  // For now, disable the button or show a message
                   console.warn('Notification not yet supported for registration tokens');
                 }
               }}
-              disabled={r.isToken} // Disable for tokens until backend supports it
+              disabled={r.isToken}
             >
               Send Notification
             </Button>
@@ -103,14 +97,16 @@ export default function InProgressList({
           );
         }
         
-        // Don't show Send Notification if waiting for HR (onboarding or document review)
         if (r.nextStep && 
             (r.nextStep.includes('Waiting for HR') || 
              r.nextStep.includes('Wait for HR'))) {
           return <Text type="secondary">No action needed</Text>;
         }
         
-        // Show Send Notification for other cases (employee needs to take action)
+        if (r.nextStep && r.nextStep.includes('Submit onboarding application')) {
+          return <Text type="secondary">No action needed</Text>;
+        }
+        
         if (r.nextStep) {
           return (
             <Button
@@ -137,10 +133,11 @@ export default function InProgressList({
           <Text type="secondary">No employees in progress.</Text>
         </div>
       )}
-      <Table
-        rowKey={(r) => r._id || `token-${r.email}`}
-        columns={columns}
-        dataSource={items}
+      <div style={{ overflowX: 'auto' }}>
+        <Table
+          rowKey={(r) => r._id || `token-${r.email}`}
+          columns={columns}
+          dataSource={items}
           loading={loading}
           pagination={pagination ? {
             current: pagination.page || 1,
@@ -152,6 +149,7 @@ export default function InProgressList({
           scroll={{ x: 'max-content' }}
           size="middle"
         />
+      </div>
     </Card>
   );
 }

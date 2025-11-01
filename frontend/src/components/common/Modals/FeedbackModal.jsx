@@ -36,7 +36,7 @@ export default function FeedbackModal({
       onCancel={onCancel}
       okText={submitting ? 'Submitting...' : 'Submit'}
       okButtonProps={{ loading: submitting }}
-      destroyOnClose
+      destroyOnHidden
       centered
     >
       <Form layout="vertical" form={form} onFinish={handleFinish}>

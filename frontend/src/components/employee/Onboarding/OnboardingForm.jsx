@@ -20,14 +20,12 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
     if (clone.visaStartDate) clone.visaStartDate = dayjs(clone.visaStartDate);
     if (clone.visaEndDate) clone.visaEndDate = dayjs(clone.visaEndDate);
     if (clone.dateOfBirth) clone.dateOfBirth = dayjs(clone.dateOfBirth);
-    // Ensure at least one empty emergency contact if none exist
     if (!clone.emergencyContacts || clone.emergencyContacts.length === 0) {
       clone.emergencyContacts = [{}];
     }
     return clone;
   }, [initialValues]);
 
-  // expose form submit to parent if requested
   useEffect(() => {
     if (onMount) {
       onMount({ submit: () => form.submit(), reset: () => form.resetFields() });
@@ -36,7 +34,7 @@ export default function OnboardingForm({ initialValues, submitting = false, onSu
 
   const handleFinish = (values) => {
     const payload = { ...values };
-    if (payload.email) delete payload.email; // do not allow changing email here
+    if (payload.email) delete payload.email;
     if (payload.dateOfBirth) payload.dateOfBirth = values.dateOfBirth?.format('YYYY-MM-DD');
     if (values.visaStartDate) payload.visaStartDate = values.visaStartDate?.format('YYYY-MM-DD');
     if (values.visaEndDate) payload.visaEndDate = values.visaEndDate?.format('YYYY-MM-DD');

@@ -34,19 +34,16 @@ export default function ContactSection() {
   }, [profile, form, isEditing]);
 
   const handleEdit = () => {
-    // Capture current form values as initial values before editing
     const currentValues = form.getFieldsValue();
     setInitialValues(currentValues);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
-    // Reset form to initial values
     if (initialValues) {
       form.resetFields();
       form.setFieldsValue(initialValues);
     } else {
-      // Fallback: reload from profile
       if (profile) {
         const values = {
           cellPhone: profile.cellPhone,

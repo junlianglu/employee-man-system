@@ -16,7 +16,6 @@ export default function UserMenu() {
   const isHR = useSelector(selectIsHR);
   const documents = useSelector(selectMyDocuments);
 
-  // Fetch documents if user is logged in and not HR (HR doesn't have profile pictures)
   useEffect(() => {
     if (user && !isHR) {
       dispatch(fetchMyDocuments());
@@ -29,13 +28,10 @@ export default function UserMenu() {
     return (fn + ln).toUpperCase();
   }, [user]);
 
-  // Get profile picture document
   const profilePictureDoc = documents?.find(d => d.type === 'profile_picture');
 
-  // Get the full URL for the profile picture
   const getProfilePictureUrl = () => {
     if (!profilePictureDoc?._id || !profilePictureDoc?.fileUrl) return undefined;
-    // If fileUrl is already a full URL, return it; otherwise prepend BASE_URL
     if (profilePictureDoc.fileUrl.startsWith('http')) {
       return profilePictureDoc.fileUrl;
     }

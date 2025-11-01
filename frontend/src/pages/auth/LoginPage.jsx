@@ -21,11 +21,9 @@ export default function LoginPage() {
         (async () => {
           try {
             const { status } = await dispatch(fetchOnboardingStatus()).unwrap();
-            // Redirect to onboarding for never_submitted, pending, or rejected
             if (status === 'never_submitted' || status === 'pending' || status === 'rejected') {
               navigate('/employee/onboarding', { replace: true });
             } else {
-              // Approved: redirect to home page (dashboard)
               const to = location.state?.from?.pathname || '/employee';
               navigate(to, { replace: true });
             }

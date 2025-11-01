@@ -42,20 +42,15 @@ export default function EmployeeCard({
   const employeeId = employee?._id;
   const employeeDocs = useSelector((state) => (employeeId ? selectEmployeeDocuments(state, employeeId) : []));
 
-  // Fetch employee documents when employee ID is available
   useEffect(() => {
     if (employeeId && (!employeeDocs || employeeDocs.length === 0)) {
       dispatch(fetchEmployeeDocuments(employeeId));
     }
   }, [dispatch, employeeId, employeeDocs]);
 
-  // Get profile picture document
   const profilePictureDoc = employeeDocs?.find(d => d.type === 'profile_picture');
-
-  // Get the full URL for the profile picture
   const getProfilePictureUrl = () => {
     if (!profilePictureDoc?._id || !profilePictureDoc?.fileUrl) return undefined;
-    // If fileUrl is already a full URL, return it; otherwise prepend BASE_URL
     if (profilePictureDoc.fileUrl.startsWith('http')) {
       return profilePictureDoc.fileUrl;
     }

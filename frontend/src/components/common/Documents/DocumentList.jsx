@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from 'react';
 import { Table, Space, Button, Popconfirm, message, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,10 +40,8 @@ export default function DocumentList({
   const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
-    // If documents prop is provided (including empty array), don't fetch
     if (documents !== undefined) return;
     
-    // Only fetch if status is 'idle' (not yet fetched)
     const currentStatus = isHR ? empStatus : myStatus;
     if (currentStatus === 'idle') {
       if (isHR && employeeId) {
@@ -60,9 +57,7 @@ export default function DocumentList({
   }, [dispatch, isHR, employeeId, documents, empStatus, myStatus]);
 
   const data = useMemo(() => {
-    // If documents prop is explicitly provided (including empty array), use it
     if (documents !== undefined) return documents;
-    // Otherwise, use fetched data (will be empty array if no documents)
     return isHR ? empDocs : myDocs;
   }, [documents, isHR, myDocs, empDocs]);
 
@@ -146,7 +141,7 @@ export default function DocumentList({
       key: 'updatedAt',
       render: (v) => (v ? new Date(v).toLocaleString() : '-'),
       width: 160,
-      responsive: ['sm', 'md', 'lg'], // Hide on xs (mobile)
+      responsive: ['sm', 'md', 'lg'],
     },
   ];
 

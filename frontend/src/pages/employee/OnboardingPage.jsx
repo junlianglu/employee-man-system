@@ -129,7 +129,6 @@ export default function OnboardingPage() {
       );
     }
 
-    // never_submitted or rejected -> editable form with possible feedback
     return (
       <>
         {status === 'rejected' && onboarding?.hrFeedback ? (

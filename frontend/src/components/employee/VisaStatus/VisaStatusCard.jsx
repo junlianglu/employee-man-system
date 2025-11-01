@@ -28,7 +28,7 @@ export default function VisaStatusCard({
     : '—';
 
   return (
-    <Card title={header} bordered>
+    <Card title={header} variant="bordered">
       <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
         <Descriptions column={1} size="small" labelStyle={{ width: 160 }}>
           <Descriptions.Item label="Citizenship">{statusTag(citizenshipStatus)}</Descriptions.Item>

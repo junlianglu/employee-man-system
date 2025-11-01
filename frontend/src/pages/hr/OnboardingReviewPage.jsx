@@ -41,7 +41,6 @@ export default function OnboardingReviewPage() {
       dispatch(fetchOnboardingApplicationDetail(employeeId));
       dispatch(fetchEmployeeDocuments(employeeId)).catch((err) => {
         console.error('Failed to fetch employee documents:', err);
-        // Don't show error message here as it might be expected for employees with no documents
       });
     }
   }, [dispatch, employeeId]);

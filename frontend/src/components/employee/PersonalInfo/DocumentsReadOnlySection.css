@@ -1,4 +1,3 @@
-/* Responsive padding for documents card */
 .documents-card {
   width: 100%;
   overflow: hidden;
@@ -8,14 +7,12 @@
   padding: 24px;
 }
 
-/* Mobile devices */
 @media (max-width: 767px) {
   .documents-card .ant-card-body {
     padding: 12px;
   }
 }
 
-/* Tablet devices */
 @media (min-width: 768px) and (max-width: 1023px) {
   .documents-card .ant-card-body {
     padding: 16px;

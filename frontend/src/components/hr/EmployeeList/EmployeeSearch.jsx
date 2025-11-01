@@ -7,7 +7,6 @@ export default function EmployeeSearch({ initial = {}, onSearchChange }) {
   const [searchValue, setSearchValue] = useState(initial.search || '');
   const debounceTimer = useRef(null);
 
-  // Real-time search on every key press
   useEffect(() => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -17,7 +16,7 @@ export default function EmployeeSearch({ initial = {}, onSearchChange }) {
       if (onSearchChange) {
         onSearchChange(searchValue);
       }
-    }, 300); // Debounce 300ms
+    }, 300);
 
     return () => {
       if (debounceTimer.current) {

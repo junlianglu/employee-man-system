@@ -30,7 +30,7 @@ export default function ConfirmModal({
       okButtonProps={{ danger, loading: confirmLoading }}
       confirmLoading={confirmLoading}
       centered={centered}
-      destroyOnClose
+      destroyOnHidden
     >
       <Space align="start">
         {iconNode}

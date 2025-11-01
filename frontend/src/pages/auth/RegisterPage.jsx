@@ -73,7 +73,7 @@ export default function RegisterPage() {
                 message.success('Registration complete. You can now sign in.');
                 navigate('/auth/login', { replace: true });
               } catch (e) {
-                // error handled below
+                console.error(e);
               }
             }}
             initialValues={{ username: '' }}

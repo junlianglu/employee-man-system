@@ -29,7 +29,7 @@ export default function DocumentStep({
   const hasFile = !!doc?.fileUrl;
   const label = toLabel(doc?.type);
   return (
-    <Card size="small" bordered style={{ marginBottom: 12 }}>
+    <Card size="small" variant="bordered" style={{ marginBottom: 12 }}>
       <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
         <Space direction="vertical" size={4}>
           <Space>

@@ -22,7 +22,7 @@ export default function Sidebar({
     return [match?.key || location.pathname];
   }, [items, location.pathname]);
 
-  const handleClick = ({ key, keyPath, item }) => {
+  const handleClick = ({ item }) => {
     const path = item?.props?.path || item?.path;
     if (path) navigate(path);
   };

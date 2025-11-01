@@ -28,6 +28,7 @@ export default function DocumentApproval({
       key: 'type',
       render: (v) => (v || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
       width: 120,
+      fixed: 'left',
     },
     { 
       title: 'File', 
@@ -80,7 +81,7 @@ export default function DocumentApproval({
             icon={<CheckOutlined />} 
             onClick={() => setModal({ open: true, docId: r._id, initialStatus: 'approved' })}
           >
-            Approve
+            <span className="approve-button-text">Approve</span>
           </Button>
           <Button 
             size="small"
@@ -88,7 +89,7 @@ export default function DocumentApproval({
             icon={<CloseOutlined />} 
             onClick={() => setModal({ open: true, docId: r._id, initialStatus: 'rejected' })}
           >
-            Reject
+            <span className="reject-button-text">Reject</span>
           </Button>
         </Space>
       ),
@@ -99,7 +100,7 @@ export default function DocumentApproval({
   return (
     <>
       <Card title="Pending Document Reviews" className="document-approval-card">
-        <div style={{ overflowX: 'auto' }}>
+        <div className="document-approval-table-wrapper">
           <Table
             rowKey={(r) => r._id}
             columns={columns}

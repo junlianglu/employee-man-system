@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
-import { Typography, Space, Card, Divider, Button, Row, Col, Alert } from 'antd';
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import { Typography, Space, Card, Button, Alert } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProfile } from '../../features/employee/employeeThunks.js';
 import { selectMyProfile } from '../../features/employee/employeeSelectors.js';
 import { fetchMyDocuments } from '../../features/document/documentThunks.js';
-import { selectMyDocuments, selectMyDocumentsStatus } from '../../features/document/documentSelectors.js';
+import { selectMyDocuments } from '../../features/document/documentSelectors.js';
 import DocumentUpload from '../../components/common/Documents/DocumentUpload.jsx';
 import StatusBadge from '../../components/common/Status/StatusBadge.jsx';
 import { message as antdMessage } from 'antd';
@@ -161,6 +161,7 @@ export default function VisaStatusPage() {
                     setTimeout(() => URL.revokeObjectURL(url), 100);
                   } catch (err) {
                     antdMessage.error('Failed to download template');
+                    console.error(err);
                   }
                 }}
               >
@@ -181,6 +182,7 @@ export default function VisaStatusPage() {
                     setTimeout(() => URL.revokeObjectURL(url), 100);
                   } catch (err) {
                     antdMessage.error('Failed to download template');
+                    console.error(err);
                   }
                 }}
               >

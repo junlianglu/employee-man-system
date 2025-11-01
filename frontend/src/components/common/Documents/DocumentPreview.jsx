@@ -15,7 +15,7 @@ export default function DocumentPreview({ open, onClose, doc, isHR = false }) {
     if (open && doc?._id) {
       dispatch(viewDocumentUrl({ docId: doc._id, hr: isHR }));
     }
-  }, [open, doc?._id, isHR]);
+  }, [dispatch, open, doc?._id, isHR]);
 
   const handleCancel = () => {
     if (preview?.url) {
@@ -56,7 +56,7 @@ export default function DocumentPreview({ open, onClose, doc, isHR = false }) {
           </Button>
         </Space>
       }
-      destroyOnClose
+      destroyOnHidden
     >
       {preview.status === 'loading' && <Skeleton active paragraph={{ rows: 8 }} />}
       {preview.status === 'failed' && (

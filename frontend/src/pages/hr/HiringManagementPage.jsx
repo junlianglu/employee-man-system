@@ -4,7 +4,7 @@ import { Row, Col, message } from 'antd';
 import TokenGenerator from '../../components/hr/HiringManagement/TokenGenerator.jsx';
 import TokenHistory from '../../components/hr/HiringManagement/TokenHistory.jsx';
 import ApplicationReview from '../../components/hr/HiringManagement/ApplicationReview.jsx';
-import './HiringManagementPage.css';
+import './styles/HiringManagementPage.css';
 
 import {
   fetchRegistrationTokens,
@@ -27,7 +27,6 @@ import {
 export default function HiringManagementPage() {
   const dispatch = useDispatch();
 
-  // Tokens
   const tokens = useSelector(selectRegistrationTokens);
   const tokensStatus = useSelector(selectRegistrationTokensStatus);
   const createStatus = useSelector(selectCreateRegistrationTokenStatus);
@@ -48,7 +47,6 @@ export default function HiringManagementPage() {
     }
   }, [dispatch]);
 
-  // Applications
   const [filter, setFilter] = useState({ status: 'pending' });
 
   const apps = useSelector(selectOnboardingApplications);

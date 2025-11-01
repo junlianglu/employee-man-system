@@ -48,7 +48,7 @@ export default function DocumentModal({
       onCancel={onCancel}
       okText={uploading ? 'Uploading...' : 'Upload'}
       okButtonProps={{ loading: uploading }}
-      destroyOnClose
+      destroyOnHidden
       centered
     >
       {document?.fileUrl && (

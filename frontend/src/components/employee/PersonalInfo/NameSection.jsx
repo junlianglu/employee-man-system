@@ -53,19 +53,16 @@ export default function NameSection() {
   }, [profile, form, isEditing]);
 
   const handleEdit = () => {
-    // Capture current form values as initial values before editing
     const currentValues = form.getFieldsValue();
     setInitialValues(currentValues);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
-    // Reset form to initial values
     if (initialValues) {
       form.resetFields();
       form.setFieldsValue(initialValues);
     } else {
-      // Fallback: reload from profile
         if (profile) {
           const values = {
             firstName: profile.firstName,
@@ -118,34 +115,21 @@ export default function NameSection() {
 
   const profilePictureDoc = documents?.find(d => d.type === 'profile_picture');
 
-  // Get the full URL for the profile picture
-  // Uses the static file path since backend serves /uploads as static files
   const getProfilePictureUrl = () => {
     if (!profilePictureDoc?._id || !profilePictureDoc?.fileUrl) return undefined;
     
-    // If fileUrl is already a full URL, return it; otherwise prepend BASE_URL
     if (profilePictureDoc.fileUrl.startsWith('http')) {
       return profilePictureDoc.fileUrl;
     }
-    // fileUrl is typically like "/uploads/filename.jpg"
     return `${BASE_URL}${profilePictureDoc.fileUrl.startsWith('/') ? '' : '/'}${profilePictureDoc.fileUrl}`;
   };
-
-  // Generate initials for default avatar
-  const getInitials = () => {
-    if (!profile) return 'U';
-    const first = profile.firstName?.[0]?.toUpperCase() || '';
-    const last = profile.lastName?.[0]?.toUpperCase() || '';
-    return first + last || 'U';
-  };
-
 
   const handleUploadProfilePicture = async ({ type, file }) => {
     try {
       await dispatch(uploadMyDocument({ type, file })).unwrap();
       message.success('Profile picture uploaded');
       setProfilePicModal({ open: false });
-      dispatch(fetchMyDocuments()); // Refresh documents
+      dispatch(fetchMyDocuments());
     } catch (e) {
       message.error(e?.message || 'Failed to upload');
     }

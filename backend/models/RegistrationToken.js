@@ -7,9 +7,9 @@ const registrationTokenSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   token: { type: String, required: true, unique: true },
   registrationLink: { type: String, required: true },
-  sentAt: { type: Date, default: Date.now }, // when token was created/sent
-  expiresAt: { type: Date, required: true }, // 3 hours later
-  submittedAt: { type: Date }, // when user finished onboarding (if any)
+  sentAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date, required: true },
+  submittedAt: { type: Date },
 }, { timestamps: true });
 
 export const RegistrationToken = mongoose.model('RegistrationToken', registrationTokenSchema);

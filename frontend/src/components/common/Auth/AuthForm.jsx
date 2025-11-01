@@ -27,7 +27,6 @@ export default function AuthForm({ title = 'Sign In', onSuccess, redirectTo }) {
           else {
             try {
               const { status } = await dispatch(fetchOnboardingStatus()).unwrap();
-              // Redirect to onboarding for never_submitted, pending, or rejected
               const dest = (status === 'never_submitted' || status === 'pending' || status === 'rejected')
                 ? '/employee/onboarding'
                 : '/employee';

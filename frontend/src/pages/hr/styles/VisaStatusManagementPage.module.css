@@ -24,12 +24,18 @@
   width: 100%;
 }
 
+.inProgressContainer {
+  width: 100%;
+}
+
 .listColumn {
   padding: 0;
+  width: 100%;
 }
 
 .actionColumn {
   padding: 0;
+  width: 100%;
 }
 
 .actionSpacer {

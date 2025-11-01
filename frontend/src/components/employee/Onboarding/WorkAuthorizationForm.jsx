@@ -47,13 +47,14 @@ export default function WorkAuthorizationForm({
                   <Form.Item noStyle shouldUpdate={(p, c) => p[workTypeName] !== c[workTypeName]}>
                     {({ getFieldValue }) => {
                       const isOther = getFieldValue(workTypeName) === 'Other';
+                      if (!isOther) return null;
                       return (
                         <Form.Item
                           name={visaTitleName}
                           label="Visa Title"
                           rules={[
                             { max: 60 },
-                            ...(isOther ? [{ required: true, message: 'Title is required for Other' }] : []),
+                            { required: true, message: 'Visa title is required when selecting Other' },
                           ]}
                         >
                           <Input placeholder="e.g., Software Engineer" />

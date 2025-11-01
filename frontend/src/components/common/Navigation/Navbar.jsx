@@ -35,8 +35,6 @@ export default function Navbar() {
   const onboardingData = useSelector(selectOnboardingStatusData);
   const activeKey = useActiveKey();
 
-  // Check if employee's onboarding is approved
-  // Default to showing navigation if onboarding data isn't loaded yet (fail-open)
   const isOnboardingApproved = isHR || (onboardingData ? onboardingData.status === 'approved' : true);
 
   const leftItems = isHR
@@ -52,7 +50,7 @@ export default function Navbar() {
         { to: '/employee/personal-info', label: 'Personal Info', icon: <IdcardOutlined /> },
         { to: '/employee/visa-status', label: 'Visa Status', icon: <ApartmentOutlined /> },
       ]
-    : []; // Only hide navigation if we have data and status is not approved
+    : [];
 
   return (
     <Header style={{ display: 'flex', alignItems: 'center', paddingInline: 16 }}>

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Typography, Space, Card, Alert } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import './EmployeeProfilesPage.css';
+// import { useNavigate } from 'react-router-dom';
+import './styles/EmployeeProfilesPage.css';
 
 import { fetchEmployees } from '../../features/employee/employeeThunks.js';
 import {
@@ -12,14 +12,13 @@ import {
 } from '../../features/employee/employeeSelectors.js';
 
 import EmployeeSearch from '../../components/hr/EmployeeList/EmployeeSearch.jsx';
-import EmployeeSummary from '../../components/hr/EmployeeList/EmployeeSummary.jsx';
 import EmployeeSummaryList from '../../components/hr/EmployeeList/EmployeeSummaryList.jsx';
 
 const { Title, Paragraph } = Typography;
 
 export default function EmployeeProfilesPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const employees = useSelector(selectEmployees);
   const employeesStatus = useSelector(selectEmployeesStatus);
@@ -27,10 +26,8 @@ export default function EmployeeProfilesPage() {
 
   const [query, setQuery] = useState({
     page: 1,
-    limit: 1000, // Fetch all for summary view sorting
+    limit: 1000,
     search: undefined,
-    //status: undefined,
-    //visa: undefined, 
   });
 
   const [realTimeSearch, setRealTimeSearch] = useState('');
@@ -39,18 +36,15 @@ export default function EmployeeProfilesPage() {
     const { page, limit, status } = query;
     const search = realTimeSearch || query.search;
     dispatch(fetchEmployees({ page, limit, search, status }));
-  }, [dispatch, query.page, query.limit, query.search, query.status, realTimeSearch]);
+  }, [dispatch, query, realTimeSearch]);
 
-  // Filter and search employees locally for real-time search
   const filteredItems = useMemo(() => {
     let filtered = employees || [];
     
-    // Apply visa filter
     if (query.visa) {
       filtered = filtered.filter((e) => e.citizenshipStatus === query.visa);
     }
 
-    // Apply real-time search filter (first name, last name, preferred name)
     if (realTimeSearch?.trim()) {
       const searchLower = realTimeSearch.toLowerCase().trim();
       filtered = filtered.filter((e) => {
@@ -68,21 +62,19 @@ export default function EmployeeProfilesPage() {
 
   const loading = employeesStatus === 'loading';
 
-  const handleChangePage = (page) => {
-    setQuery((q) => ({ ...q, page }));
-  };
+  // const handleChangePage = (page) => {
+  //   setQuery((q) => ({ ...q, page }));
+  // };
 
-  const onViewProfile = (employeeId) => {
-    // Open in new tab - using window.open
-    window.open(`/hr/hiring/review/${employeeId}`, '_blank', 'noopener,noreferrer');
-  };
-  const onViewDocuments = (employeeId) => navigate(`/hr/visa-status`);
+  // const onViewProfile = (employeeId) => {
+  //   window.open(`/hr/hiring/review/${employeeId}`, '_blank', 'noopener,noreferrer');
+  // };
+  // const onViewDocuments = (employeeId) => navigate(`/hr/visa-status`);
 
   const handleRealTimeSearch = (value) => {
     setRealTimeSearch(value);
   };
 
-  // Determine search result message
   const searchResultMessage = useMemo(() => {
     if (!realTimeSearch?.trim()) return null;
     const count = filteredItems.length;

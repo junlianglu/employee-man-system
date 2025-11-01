@@ -11,7 +11,6 @@ export default function DocumentsReadOnlySection() {
   const allDocuments = useSelector(selectMyDocuments);
   const documentsStatus = useSelector(selectMyDocumentsStatus);
 
-  // Fetch documents only if status is 'idle' (not yet fetched)
   React.useEffect(() => {
     if (documentsStatus === 'idle') {
       dispatch(fetchMyDocuments()).catch((err) => {
@@ -20,12 +19,10 @@ export default function DocumentsReadOnlySection() {
     }
   }, [dispatch, documentsStatus]);
 
-  // Filter out profile_picture since it's displayed in Name & Basic section
   const filteredDocuments = useMemo(() => {
     if (documentsStatus === 'loading' || documentsStatus === 'idle') {
-      return undefined; // Don't show documents while loading
+      return undefined;
     }
-    // Once loaded (succeeded or failed), show the filtered list (even if empty)
     return (allDocuments || []).filter(doc => doc.type !== 'profile_picture');
   }, [allDocuments, documentsStatus]);
 

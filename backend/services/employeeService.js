@@ -61,7 +61,6 @@ export const reviewOnboardingApplication = async (employeeId, reviewData) => {
   
   await employee.save();
   
-  // If onboarding is approved, auto-approve non-OPT documents
   if (status === 'approved') {
     const Document = (await import('../models/Document.js')).Document;
     const nonOptDocumentTypes = ['profile_picture', 'drivers_license', 'work_authorization'];
@@ -98,13 +97,11 @@ export const getEmployeeById = async (employeeId) => {
 };
 
 export const updateEmployee = async (employeeId, updateData) => {
-  // Enforce onboarding required fields when moving to pending
   if (updateData?.onboardingReview?.status === 'pending') {
     const required = [];
     const has = (obj, path) => path.split('.').reduce((o, k) => (o && o[k] !== undefined && o[k] !== null ? o[k] : undefined), obj) !== undefined;
     const check = (cond, name) => { if (!cond) required.push(name); };
 
-    // Note: username is set during registration, not during onboarding submission
     check(!!updateData.ssn, 'ssn');
     check(!!updateData.dateOfBirth, 'dateOfBirth');
     check(!!updateData.gender, 'gender');
@@ -114,15 +111,12 @@ export const updateEmployee = async (employeeId, updateData) => {
     check(!!has(updateData, 'address.zip'), 'address.zip');
     check(!!updateData.cellPhone, 'cellPhone');
 
-    // Reference (1 only)
     check(!!has(updateData, 'reference.firstName'), 'reference.firstName');
     check(!!has(updateData, 'reference.lastName'), 'reference.lastName');
     check(!!has(updateData, 'reference.relationship'), 'reference.relationship');
 
-    // Emergency contacts (at least 1)
     check(Array.isArray(updateData.emergencyContacts) && updateData.emergencyContacts.length > 0, 'emergencyContacts[0]');
 
-    // Citizenship/work visa dependencies
     check(!!updateData.citizenshipStatus, 'citizenshipStatus');
     if (updateData.citizenshipStatus === 'work_visa') {
       check(!!updateData.workAuthorizationType, 'workAuthorizationType');
@@ -241,7 +235,6 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
   const { RegistrationToken } = await import('../models/RegistrationToken.js');
   const now = new Date();
 
-  // Step 1: Get registration tokens that haven't been used (no employee exists, token not expired, not submitted)
   const unusedTokens = await RegistrationToken.find({
     submittedAt: { $exists: false },
     expiresAt: { $gt: now }
@@ -250,7 +243,6 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
     .sort({ createdAt: -1 })
     .lean();
 
-  // Check which tokens don't have corresponding employees
   const tokensWithNoEmployee = [];
   for (const token of unusedTokens) {
     const employeeExists = await Employee.findOne({ email: token.email });
@@ -258,21 +250,17 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
       tokensWithNoEmployee.push({
         ...token,
         _id: token._id || `token-${token.email}`,
-        isToken: true, // Flag to identify this is a token, not an employee
+        isToken: true,
         onboardingReview: { status: 'never_submitted' }
       });
     }
   }
 
-  // Step 2: Get employees who haven't completed the full process
-  // This includes: never_submitted, pending, rejected onboarding OR approved onboarding but incomplete OPT docs
   let employeeQuery = {
     $or: [
-      // Employees who haven't submitted onboarding
       { 'onboardingReview.status': 'never_submitted' },
       { 'onboardingReview.status': 'pending' },
       { 'onboardingReview.status': 'rejected' },
-      // OR employees with approved onboarding but potentially incomplete OPT docs
       {
         'onboardingReview.status': 'approved',
         citizenshipStatus: 'work_visa',
@@ -305,14 +293,11 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
   const state = (doc) => (doc ? doc.status : 'not_uploaded');
   const feedback = (doc) => (doc?.hrFeedback ? ` HR feedback: ${doc.hrFeedback}` : '');
 
-  // Compute next step based on employee state
   const computeNextStep = (employee) => {
-    // If this is a token (not an employee yet)
     if (employee.isToken) {
       return { nextStep: 'Next step: Submit registration using the registration token link sent via email.' };
     }
 
-    // Check onboarding status first
     const onboardingStatus = employee.onboardingReview?.status || 'never_submitted';
     
     if (onboardingStatus === 'never_submitted') {
@@ -330,7 +315,6 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
       return { nextStep: `Next step: Review feedback and resubmit onboarding application.${feedbackText}` };
     }
 
-    // If onboarding is approved, check OPT documents
     if (onboardingStatus === 'approved' && 
         employee.citizenshipStatus === 'work_visa' && 
         employee.workAuthorizationType === 'F1(CPT/OPT)') {
@@ -364,7 +348,6 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
     return { nextStep: 'Please review your status for next steps.' };
   };
 
-  // Combine tokens and employees
   const allItems = [
     ...tokensWithNoEmployee.map(token => ({
       ...token,
@@ -382,7 +365,6 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
     ...employees
   ];
 
-  // Filter by search if provided
   let filteredItems = allItems;
   if (search) {
     const searchLower = search.toLowerCase().trim();
@@ -398,12 +380,10 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
     });
   }
 
-  // Process each item to determine if they're truly in progress
   const inProgressAll = filteredItems
     .map(item => {
       const { nextStep, pendingDoc } = computeNextStep(item);
       
-      // Determine if all approved (only applies to OPT employees with approved onboarding)
       let allApproved = false;
       if (item.onboardingReview?.status === 'approved' &&
           item.citizenshipStatus === 'work_visa' &&
@@ -423,14 +403,12 @@ export const getEmployeesWithIncompleteOptDocs = async ({ page = 1, limit = 10, 
         allApproved
       };
     })
-    .filter(item => !item.allApproved); // Filter out those who completed everything
+    .filter(item => !item.allApproved);
 
-  // Apply pagination
   const total = inProgressAll.length;
   const start = (page - 1) * limit;
   const list = inProgressAll.slice(start, start + limit);
 
-  // Add days remaining for employees with visa dates
   const withDays = list.map(item => ({
     ...item,
     daysRemaining: item.visaEndDate ? Math.ceil((new Date(item.visaEndDate) - now) / 86400000) : null

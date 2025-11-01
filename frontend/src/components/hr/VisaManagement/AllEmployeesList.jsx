@@ -99,7 +99,7 @@ export default function AllEmployeesList({
       width: 100,
     },
     {
-      title: 'Approved&uploaded Documents',
+      title: 'Approved',
       key: 'documents',
       render: (_, r) => {
         const approvedDocs = (r.documents || []).filter(d => d && d.status === 'approved');
